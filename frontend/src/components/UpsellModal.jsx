@@ -1,21 +1,40 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { Sparkles, X, Plus } from "lucide-react";
+import { Sparkles, X, Plus, Clock } from "lucide-react";
 import { useCart, formatRupiah } from "../lib/cart";
 import { trackAddToCart } from "../lib/tracker";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 const DISCOUNT = 0.10; // 10%
+const COUNTDOWN_SEC = 600; // 10 menit
 
 export default function UpsellModal({ open, onOpenChange, target }) {
   const { add } = useCart();
+  const [secLeft, setSecLeft] = useState(COUNTDOWN_SEC);
+
+  useEffect(() => {
+    if (!open) { setSecLeft(COUNTDOWN_SEC); return; }
+    const t = setInterval(() => setSecLeft((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, [open]);
+
   if (!target) return null;
+
+  const mm = String(Math.floor(secLeft / 60)).padStart(2, "0");
+  const ss = String(secLeft % 60).padStart(2, "0");
+  const expired = secLeft === 0;
 
   const discounted = Math.round(target.price * (1 - DISCOUNT));
   const saving = target.price - discounted;
 
   const accept = () => {
-    const upsellProduct = { ...target, price: discounted, name: `${target.name} (Bundle -10%)` };
+    const upsellProduct = {
+      ...target,
+      id: `${target.id}-bundle`,
+      price: discounted,
+      name: `${target.name} (Bundle -10%)`,
+    };
     add(upsellProduct, 1);
     trackAddToCart(upsellProduct, 1);
     toast.success(`Bundle deal! Hemat ${formatRupiah(saving)}`);
@@ -54,6 +73,14 @@ export default function UpsellModal({ open, onOpenChange, target }) {
           </DialogHeader>
 
           <div className="mt-5 p-4 rounded-2xl bg-[hsla(192,55%,22%,0.5)] border border-[hsla(174,70%,55%,0.2)]">
+            <div className="flex items-center justify-between mb-3 pb-3 border-b border-[hsla(174,70%,55%,0.15)]">
+              <span className="text-xs uppercase tracking-widest opacity-60 inline-flex items-center gap-1.5">
+                <Clock className="w-3 h-3" /> Promo bundle berakhir dalam
+              </span>
+              <span data-testid="upsell-countdown" className={`font-mono text-lg font-bold ${expired ? "text-red-400" : "text-[hsl(var(--reef-coral))]"}`}>
+                {expired ? "Habis" : `${mm}:${ss}`}
+              </span>
+            </div>
             <div className="flex items-end justify-between">
               <div>
                 <div className="text-xs uppercase tracking-widest opacity-60 mb-1">Harga Bundle</div>
@@ -70,9 +97,10 @@ export default function UpsellModal({ open, onOpenChange, target }) {
             <Button
               data-testid="upsell-accept"
               onClick={accept}
-              className="coral-pill hover:opacity-90 h-12 rounded-full font-semibold w-full"
+              disabled={expired}
+              className="coral-pill hover:opacity-90 h-12 rounded-full font-semibold w-full disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <Plus className="w-4 h-4 mr-1" /> Iya, Tambahin Sekalian
+              <Plus className="w-4 h-4 mr-1" /> {expired ? "Promo Habis" : "Iya, Tambahin Sekalian"}
             </Button>
             <Button
               data-testid="upsell-decline"
