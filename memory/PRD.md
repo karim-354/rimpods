@@ -88,17 +88,27 @@ User clarifications:
 - **Backend auth module** (`/app/backend/auth.py`): session exchange endpoint dengan Emergent, httpOnly+Secure+SameSite=None cookie, timezone-aware expiry handling, `require_admin` dependency untuk guard route
 - **Backend admin module** (`/app/backend/admin.py`): orders list, stats aggregation, status patch
 
+### v7 (Feb 2026 — Admin Actionability)
+- **WhatsApp Quick Actions** per order row di admin dashboard
+  - Tombol hijau pill di kolom "Aksi" → dropdown 4 template pesan
+  - **Konfirmasi Order**: greeting + item summary + total + permintaan bukti transfer
+  - **Cek Alamat**: konfirmasi alamat pengiriman sebelum diproses
+  - **Kirim Resi**: dialog input (Kurir + No. Resi + ETA) → preview → buka WA
+  - **Follow-up**: pesan post-arrival + ajakan review Tokopedia
+  - Phone auto-normalize Indonesia (`08xx` / `8xx` / `62xx` → `62xxxxx`)
+  - Copy template ke clipboard tanpa buka WA (tombol copy per template)
+  - Disabled state kalau customer tidak punya nomor valid
+
 ## Test Status
-- Backend: 45/45 pytest pass (iter 4–7 cumulative)
-- Frontend: semua iter PASS — admin login gate, dashboard data, voucher breakdown, non-admin 403 block, logout flow semua verified
+- Backend: 45/45 pytest pass (iter 4–8 cumulative — iter 8 regression only)
+- Frontend: 10/10 iter-8 checks PASS, tidak ada regression
 
 ## Next Action Items
-1. **Pending user input**: Email admin Google asli (update `ADMIN_EMAILS` di `backend/.env`)
-2. **Task 3 Pending**: Email confirmation via SMTP (butuh host/port/user/password — Gmail app password atau Zoho)
-3. **Task 4 Pending**: Midtrans payment integration (butuh Server Key + Client Key + Merchant ID dari dashboard Midtrans)
+1. **Pending user input**: Email admin Google asli (update `ADMIN_EMAILS` di `/app/backend/.env`)
+2. **Task 4 Pending — Midtrans**: butuh kredensial dari user (Server Key + Client Key + Merchant ID). Code skeleton siap diimplementasi saat keys tersedia.
+3. **Task 3 Pending — Email SMTP**: butuh SMTP host/port/user/pass
 
 ## Backlog
-- P2: Email confirmation via SMTP (Gmail/Zoho)
-- P2: Midtrans payment gateway (Snap popup)
 - P2: Produk low-ticket (<Rp100k) untuk coverage voucher-ineligible
 - P2: English version
+- P2: Abandoned cart WhatsApp nudge
