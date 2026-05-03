@@ -76,13 +76,29 @@ User clarifications:
 - **WhatsApp message refresh** — formal-warm: *"Halo Tim Rimpods, saya ingin melanjutkan pemesanan berikut…"* + penutup *"Terima kasih, saya tunggu konfirmasinya."*
 - Upsell/ExitIntent/Cart/Checkout/Success semua disesuaikan dengan voice yang sama.
 
+### v6 (Feb 2026 — Concierge + Admin Dashboard)
+- **Concierge Line** WhatsApp di hero section dengan ikon Crown — link ke admin dengan pesan konsultasi pre-filled, untuk segmen HNW/premium
+- **Admin Dashboard** di `/admin` dengan **Emergent Google Auth** + email whitelist (`ADMIN_EMAILS` env var)
+  - Login gate: tombol "Masuk dengan Google" → redirect ke auth.emergentagent.com → callback `#session_id=` diproses via `AppRouter` + `AuthCallback` component
+  - Non-whitelist email → tampilkan "Akses tidak diizinkan" dengan tombol logout
+  - Dashboard KPI: total orders (30d + overall), revenue (30d + overall), voucher redemptions + nilai diskon, channel breakdown
+  - Orders table: 50 terbaru dengan order_number, tanggal, customer, item summary, total, voucher, channel, status
+  - Voucher performance section: breakdown per kode dengan redemption count + total discount
+  - `PATCH /api/admin/orders/{id}/status` untuk update status order (pending/confirmed/shipped/delivered/cancelled)
+- **Backend auth module** (`/app/backend/auth.py`): session exchange endpoint dengan Emergent, httpOnly+Secure+SameSite=None cookie, timezone-aware expiry handling, `require_admin` dependency untuk guard route
+- **Backend admin module** (`/app/backend/admin.py`): orders list, stats aggregation, status patch
+
 ## Test Status
-- Backend: 28/28 pytest pass (iter 4 + 5 + 6 cumulative)
-- Frontend: iter 4/5/6 semua PASS — copy verified, no regressions di flow voucher/bundle/countdown/pixel
+- Backend: 45/45 pytest pass (iter 4–7 cumulative)
+- Frontend: semua iter PASS — admin login gate, dashboard data, voucher breakdown, non-admin 403 block, logout flow semua verified
 
 ## Next Action Items
-1. P2: Admin dashboard untuk order masuk + redeemed voucher stats
-2. P2: Email confirmation via Resend/SMTP
-3. P2: Produk low-ticket (<Rp100.000) untuk menguji cabang voucher-ineligible (saat ini logical-only)
-4. P2: Stripe / Midtrans integration untuk payment di-page
-5. P2: English version
+1. **Pending user input**: Email admin Google asli (update `ADMIN_EMAILS` di `backend/.env`)
+2. **Task 3 Pending**: Email confirmation via SMTP (butuh host/port/user/password — Gmail app password atau Zoho)
+3. **Task 4 Pending**: Midtrans payment integration (butuh Server Key + Client Key + Merchant ID dari dashboard Midtrans)
+
+## Backlog
+- P2: Email confirmation via SMTP (Gmail/Zoho)
+- P2: Midtrans payment gateway (Snap popup)
+- P2: Produk low-ticket (<Rp100k) untuk coverage voucher-ineligible
+- P2: English version
