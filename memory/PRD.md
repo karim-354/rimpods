@@ -64,13 +64,25 @@ User clarifications:
 - **Voucher backend** — `POST /api/orders` accept `voucher_code`, validate min subtotal, include diskon di WA message. Order schema sekarang punya `discount` + `voucher_code` fields.
 - **Voucher frontend** — banner di Checkout (eligible/non-eligible state), auto-apply di payload, auto-clear setelah sukses, tombol remove manual.
 
+### v5 (Feb 2026 — Premium Voice & TikTok Shop)
+- **TikTok Shop deep-link asli** per produk (`shop-id.tokopedia.com/view/product/...` dengan encode_params signed) — 3 produk semua pointing ke listing resmi.
+- **Rewrite copy sitewide** dengan nada warm-premium (NLP persuasive yang hangat, prestigious tapi inklusif). Target HNW tetap terjaga tanpa terkesan angkuh.
+  - Hero: *"Tank yang hidup, bukan sekadar indah."*
+  - Produk: *"Tiga pilihan, satu standar kualitas."*
+  - Cerita: *"Coral merespons kualitas, bukan janji."*
+  - Cara Pakai: *"Tiga langkah, dan coral akan bicara sendiri."*
+  - CTA: *"Tank kamu siap memperlihatkan potensinya."*
+  - Product taglines: Rotifer 2L ("Nutrisi hidup untuk tank yang ingin lebih dari sekadar jernih."), Paket Hemat ("Ritual feeding yang tenang untuk reefer yang menjaga konsistensi."), TBN ("Langkah tenang saat parameter air mulai bergeser.")
+- **WhatsApp message refresh** — formal-warm: *"Halo Tim Rimpods, saya ingin melanjutkan pemesanan berikut…"* + penutup *"Terima kasih, saya tunggu konfirmasinya."*
+- Upsell/ExitIntent/Cart/Checkout/Success semua disesuaikan dengan voice yang sama.
+
 ## Test Status
-- Backend: 22/22 pytest pass (iter 4 + iter 5)
-- Frontend: iter 4 & 5 PASS — semua flow end-to-end verified, no regressions
+- Backend: 28/28 pytest pass (iter 4 + 5 + 6 cumulative)
+- Frontend: iter 4/5/6 semua PASS — copy verified, no regressions di flow voucher/bundle/countdown/pixel
 
 ## Next Action Items
-1. **Pending user input**: TikTok Shop deep-link URL asli per produk (sekarang masih `tiktok.com/search?q=...`)
-2. P2: Admin dashboard untuk lihat order masuk + redeemed voucher stats
-3. P2: Email confirmation via Resend/SMTP
+1. P2: Admin dashboard untuk order masuk + redeemed voucher stats
+2. P2: Email confirmation via Resend/SMTP
+3. P2: Produk low-ticket (<Rp100.000) untuk menguji cabang voucher-ineligible (saat ini logical-only)
 4. P2: Stripe / Midtrans integration untuk payment di-page
-5. P2: Multi-bahasa (English version)
+5. P2: English version
