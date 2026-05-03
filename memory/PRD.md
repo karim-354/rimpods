@@ -50,11 +50,20 @@ User clarifications:
 - P2: Stripe / Midtrans integration untuk payment di-page
 - P2: Multi-bahasa (English version)
 
+### v3 (Feb 2026)
+- **TBN photo swap** ke asset asli Rimpods (customer-assets emergentagent)
+- **Upsell bundle split** — accept upsell masuk sebagai cart line terpisah (`${id}-bundle`), tidak merge dengan base item
+- **Countdown urgency** 10 menit di UpsellModal (MM:SS, button disable + label "Promo Habis" saat expired)
+- **Rimpods 2L photo swap** ke asset Rimpods (`a1.jpeg` + `aa.jpeg` sebagai hover/alt)
+- **Backend bundle recognition** — POST `/api/orders` sekarang accept `${id}-bundle` product_id dan otomatis apply 10% discount + label `(Bundle -10%)` + flag `is_bundle: true`
+
 ## Test Status
-- Backend: 10/10 pytest pass (products, orders, shipping logic, persistence, content verify)
-- Frontend: visual smoke test pass; e2e via testing_agent verified add-to-cart + drawer
+- Backend: 14/14 pytest pass (iteration_4: products, orders, shipping, bundle suffix, fingerprint)
+- Frontend: iteration_4 PASS — 3 cards render, rotifer image swapped, upsell modal + countdown ticking, bundle cart split verified, fbq/ttq pixels load
 
 ## Next Action Items
-1. Ganti placeholder WhatsApp number (`RIMPODS_WHATSAPP` env di backend/.env) dengan nomor admin Rimpods asli
-2. Download logo + foto produk dari Google Drive yang user share, upload, ganti URL
-3. Tambah pixel tracking buat ngukur konversi paid ads
+1. Replace TikTok Shop search placeholders (`tiktok.com/search?q=...`) dengan TikTok Shop deep-link asli per produk
+2. Optional: persist upsell countdown `startTimestamp` ke sessionStorage biar urgency tidak reset kalau modal ditutup-buka
+3. P2: Admin dashboard untuk lihat order masuk
+4. P2: Email confirmation via Resend/SMTP
+5. P2: Stripe / Midtrans integration untuk payment di-page

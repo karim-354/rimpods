@@ -162,11 +162,35 @@ class ContentCheckRequest(BaseModel):
 
 
 # === Helpers ===
+BUNDLE_SUFFIX = "-bundle"
+BUNDLE_DISCOUNT = 0.10  # 10% off when ordered as upsell bundle
+
+
 def _find_product(pid: str):
     for p in PRODUCTS:
         if p["id"] == pid:
             return p
     return None
+
+
+def _resolve_cart_item(pid: str):
+    """Resolve a cart product_id into (product, effective_price, display_name, is_bundle).
+
+    Accepts both base ids (e.g. 'tbn-turn-back-nutrients') and bundle ids
+    (e.g. 'tbn-turn-back-nutrients-bundle'). Bundle items get 10% off.
+    """
+    is_bundle = pid.endswith(BUNDLE_SUFFIX)
+    base_id = pid[: -len(BUNDLE_SUFFIX)] if is_bundle else pid
+    prod = _find_product(base_id)
+    if not prod:
+        return None, 0, "", False
+    if is_bundle:
+        price = round(prod["price"] * (1 - BUNDLE_DISCOUNT))
+        name = f"{prod['name']} (Bundle -10%)"
+    else:
+        price = prod["price"]
+        name = prod["name"]
+    return prod, price, name, is_bundle
 
 
 def _build_whatsapp_url(order_number: str, items: list, contact: dict, total: int) -> str:
@@ -219,18 +243,19 @@ async def create_order(payload: OrderCreate):
     detailed_items = []
     subtotal = 0
     for it in payload.items:
-        prod = _find_product(it.product_id)
+        prod, price, name, is_bundle = _resolve_cart_item(it.product_id)
         if not prod:
             raise HTTPException(status_code=400, detail=f"Produk {it.product_id} tidak valid")
-        line_total = prod["price"] * it.quantity
+        line_total = price * it.quantity
         subtotal += line_total
         detailed_items.append({
-            "product_id": prod["id"],
-            "name": prod["name"],
-            "price": prod["price"],
+            "product_id": it.product_id,
+            "name": name,
+            "price": price,
             "quantity": it.quantity,
             "line_total": line_total,
             "tokopedia_url": prod["tokopedia_url"],
+            "is_bundle": is_bundle,
         })
 
     shipping = 0 if subtotal >= 250000 else 18000
