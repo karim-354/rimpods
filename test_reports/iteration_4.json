@@ -1,0 +1,28 @@
+{
+  "summary": "Iter 4 testing — bundle line split, 10-min countdown, refreshed Rimpods 2L image. Backend 14/14 PASS (test_v4_bundle_image.py: products + image asset + orders shipping + wa.me/6282216594354 + RMP order_number + fingerprint quick-check + verify). Frontend: rotifer image swapped to kvng7upw_a1.jpeg, 3 cards with Toko + TikTok buttons render, upsell modal opens ~700ms after add-to-cart, countdown shows MM:SS at 10:00 and ticks down (10:00→09:57 verified), accept creates SEPARATE cart line tbn-turn-back-nutrients-bundle at 179100 (10% off 199000) NOT merged with base, decline keeps base only, fbq + ttq pixels loaded, checkout page renders with shipping/total totals.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v4_bundle_image.py",
+    "/app/test_reports/pytest/iter4_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Bundle split now uses ${target.id}-bundle suffix — addresses prior iter3 quirk. Verified: cart contains 2 distinct lines after upsell accept.",
+    "Countdown timer is purely client-side and resets every modal open (state reset in useEffect when !open). For real urgency, persist startTimestamp in sessionStorage so closing/reopening doesn't reset to 10:00. Acceptable for v1 marketing UX.",
+    "fingerprint_check.py has very lightweight English-AI detection (penalties primarily target Indonesian formal patterns). Indonesian-AI text detected fine (score ≤ 55 in our test). English AI text scored 70 — not flagged. If site ever needs to verify English copy, detector needs an English module.",
+    "tiktok_shop_url values are still https://www.tiktok.com/search?q=... search placeholders — replace with real TikTok Shop deep-links before prod (carryover from iter3).",
+    "Upsell discount is client-only; backend /api/orders recomputes price from product_id (and the -bundle suffix is not a known product_id) — this means if cart items were sent to /api/orders containing a -bundle id, backend would reject with 400 'Produk … tidak valid'. Currently checkout flow only sends WA-redirect-style items so this isn't hit, but it IS a latent bug if anyone ever calls POST /api/orders with the cart's localStorage as-is. Recommend either: (a) frontend strips '-bundle' before submitting, or (b) backend recognizes '-bundle' suffix and applies discount."
+  ],
+  "updated_files": ["/app/backend/tests/test_v4_bundle_image.py"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "seed_data_creation": "TEST_-prefixed orders created via /api/orders during pytest run; not cleaned up (orders collection only).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iter 4 verifies: (1) rotifer-2l-phyto image swapped to customer-assets …kvng7upw_a1.jpeg (image_alt = aa.jpeg), (2) UpsellModal countdown 10:00 MM:SS ticking, button disables + label switches to 'Promo Habis' when secLeft===0 (tested via state inspection of code; live expiry not waited 10 min in playwright), (3) bundle cart split via product_id suffix '-bundle' so base + upsell are 2 cart lines. Latent risk noted: backend rejects '-bundle' suffix in POST /api/orders. test_v4_bundle_image.py covers all backend changes plus regression of order/pricing/fingerprint endpoints.",
+  "rca of the issue": "N/A — no live issues. One latent risk documented re: -bundle suffix vs backend price validation."
+}
