@@ -1,4 +1,4 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "./ui/sheet";
 import { Button } from "./ui/button";
 import { useCart, formatRupiah } from "../lib/cart";
 import { Minus, Plus, Trash2, ArrowRight } from "lucide-react";
@@ -23,6 +23,9 @@ export default function CartDrawer({ open, onOpenChange }) {
           <SheetTitle className="font-display text-2xl text-[hsl(var(--reef-foam))]">
             Keranjang Kamu
           </SheetTitle>
+          <SheetDescription className="text-[hsl(var(--reef-foam))]/60">
+            Cek pesanan kamu sebelum lanjut ke checkout.
+          </SheetDescription>
         </SheetHeader>
 
         {items.length === 0 ? (
