@@ -8,16 +8,29 @@ import { useEffect, useState } from "react";
 
 const DISCOUNT = 0.10; // 10%
 const COUNTDOWN_SEC = 600; // 10 menit
+const TS_KEY = (id) => `rimpods_upsell_ts_${id}`;
 
 export default function UpsellModal({ open, onOpenChange, target }) {
   const { add } = useCart();
   const [secLeft, setSecLeft] = useState(COUNTDOWN_SEC);
 
   useEffect(() => {
-    if (!open) { setSecLeft(COUNTDOWN_SEC); return; }
-    const t = setInterval(() => setSecLeft((s) => (s > 0 ? s - 1 : 0)), 1000);
+    if (!open || !target) return;
+    // Persist a per-target start timestamp so closing/reopening doesn't reset urgency
+    const key = TS_KEY(target.id);
+    let startMs = Number(sessionStorage.getItem(key));
+    if (!startMs || Number.isNaN(startMs)) {
+      startMs = Date.now();
+      sessionStorage.setItem(key, String(startMs));
+    }
+    const tick = () => {
+      const elapsed = Math.floor((Date.now() - startMs) / 1000);
+      setSecLeft(Math.max(0, COUNTDOWN_SEC - elapsed));
+    };
+    tick();
+    const t = setInterval(tick, 1000);
     return () => clearInterval(t);
-  }, [open]);
+  }, [open, target]);
 
   if (!target) return null;
 

@@ -69,8 +69,8 @@ PRODUCTS = [
         "reviews": 312,
         "sold": "500+",
         "stock": 240,
-        "image": "https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?w=900&q=80",
-        "image_alt": "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=900&q=80",
+        "image": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/f12ycsla_WhatsApp%20Image%202026-05-03%20at%208.19.10%20PM%20%283%29.jpeg",
+        "image_alt": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/h18wqlnd_WhatsApp%20Image%202026-05-03%20at%208.19.10%20PM%20%282%29.jpeg",
         "tokopedia_url": "https://www.tokopedia.com/rimpods/paket-hemat-5-rotifer-1-phytoplankton-rotifera-pakan-coral-food",
         "tiktok_shop_url": "https://www.tiktok.com/search?q=Rimpods+Paket+Hemat+Rotifer",
         "upsell_target": "tbn-turn-back-nutrients",
@@ -138,6 +138,7 @@ class OrderCreate(BaseModel):
     items: List[CartItem]
     contact: ContactInfo
     payment_channel: str = "whatsapp"  # 'whatsapp' or 'tokopedia'
+    voucher_code: Optional[str] = None
 
 
 class Order(BaseModel):
@@ -148,6 +149,8 @@ class Order(BaseModel):
     contact: dict
     subtotal: int
     shipping: int
+    discount: int = 0
+    voucher_code: Optional[str] = None
     total: int
     payment_channel: str
     whatsapp_url: str
@@ -164,6 +167,10 @@ class ContentCheckRequest(BaseModel):
 # === Helpers ===
 BUNDLE_SUFFIX = "-bundle"
 BUNDLE_DISCOUNT = 0.10  # 10% off when ordered as upsell bundle
+VOUCHERS = {
+    # code -> (flat discount in IDR, min subtotal to activate)
+    "FIRSTBUY20K": (20000, 100000),
+}
 
 
 def _find_product(pid: str):
@@ -193,7 +200,8 @@ def _resolve_cart_item(pid: str):
     return prod, price, name, is_bundle
 
 
-def _build_whatsapp_url(order_number: str, items: list, contact: dict, total: int) -> str:
+def _build_whatsapp_url(order_number: str, items: list, contact: dict, total: int,
+                        discount: int = 0, voucher_code: Optional[str] = None) -> str:
     lines = [
         "Halo Rimpods! Aku mau order nih:",
         f"No order: *{order_number}*",
@@ -202,6 +210,8 @@ def _build_whatsapp_url(order_number: str, items: list, contact: dict, total: in
     ]
     for it in items:
         lines.append(f"- {it['name']} x{it['quantity']} = Rp{it['line_total']:,}".replace(",", "."))
+    if discount > 0 and voucher_code:
+        lines.append(f"- Voucher {voucher_code} = -Rp{discount:,}".replace(",", "."))
     lines += [
         "",
         f"*Total:* Rp{total:,}".replace(",", "."),
@@ -259,12 +269,26 @@ async def create_order(payload: OrderCreate):
         })
 
     shipping = 0 if subtotal >= 250000 else 18000
-    total = subtotal + shipping
+
+    # Apply voucher discount (never below 0, and never discounts shipping)
+    discount = 0
+    voucher_code = (payload.voucher_code or "").strip().upper() or None
+    if voucher_code and voucher_code in VOUCHERS:
+        flat, min_sub = VOUCHERS[voucher_code]
+        if subtotal >= min_sub:
+            discount = min(flat, subtotal)
+        else:
+            voucher_code = None
+    else:
+        voucher_code = None  # ignore invalid codes silently
+
+    total = subtotal - discount + shipping
 
     order_number = "RMP" + datetime.now(timezone.utc).strftime("%y%m%d") + uuid.uuid4().hex[:5].upper()
     contact_dict = payload.contact.model_dump()
 
-    wa_url = _build_whatsapp_url(order_number, detailed_items, contact_dict, total)
+    wa_url = _build_whatsapp_url(order_number, detailed_items, contact_dict, total,
+                                 discount=discount, voucher_code=voucher_code)
     # First product Tokopedia link as primary fallback
     toko_url = detailed_items[0]["tokopedia_url"] if detailed_items else TOKO_BASE
 
@@ -274,6 +298,8 @@ async def create_order(payload: OrderCreate):
         contact=contact_dict,
         subtotal=subtotal,
         shipping=shipping,
+        discount=discount,
+        voucher_code=voucher_code,
         total=total,
         payment_channel=payload.payment_channel,
         whatsapp_url=wa_url,

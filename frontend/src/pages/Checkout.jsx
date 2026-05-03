@@ -8,16 +8,19 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
-import { ChevronLeft, MessageCircle, ShoppingBag } from "lucide-react";
+import { ChevronLeft, MessageCircle, ShoppingBag, Gift, X } from "lucide-react";
 import { toast } from "sonner";
 import { trackInitiateCheckout, trackLead } from "../lib/tracker";
+import { getVoucher, clearVoucher, VOUCHER_VALUE } from "../lib/voucher";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const MIN_VOUCHER_SUBTOTAL = 100000;
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const { items, subtotal, shipping, total, clear } = useCart();
+  const { items, subtotal, shipping, total: baseTotal, clear } = useCart();
   const [submitting, setSubmitting] = useState(false);
+  const [voucher, setVoucher] = useState(getVoucher());
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -27,6 +30,20 @@ export default function Checkout() {
     notes: "",
   });
   const [channel, setChannel] = useState("whatsapp");
+
+  useEffect(() => {
+    const sync = () => setVoucher(getVoucher());
+    window.addEventListener("rimpods:voucher", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("rimpods:voucher", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+
+  const voucherEligible = !!voucher && subtotal >= MIN_VOUCHER_SUBTOTAL;
+  const discount = voucherEligible ? Math.min(VOUCHER_VALUE, subtotal) : 0;
+  const total = Math.max(0, baseTotal - discount);
 
   useEffect(() => {
     if (items.length > 0) trackInitiateCheckout(items, total);
@@ -51,6 +68,7 @@ export default function Checkout() {
         items: items.map((i) => ({ product_id: i.product_id, quantity: i.quantity })),
         contact: form,
         payment_channel: channel,
+        voucher_code: voucherEligible ? voucher : null,
       };
       const { data } = await axios.post(`${API}/orders`, payload);
       const orderInfo = {
@@ -64,6 +82,7 @@ export default function Checkout() {
       sessionStorage.setItem("rimpods_last_order", JSON.stringify(orderInfo));
       trackLead(data);
       clear();
+      if (voucherEligible) clearVoucher();
       navigate("/sukses");
     } catch (err) {
       toast.error("Gagal proses order, coba lagi ya.");
@@ -150,6 +169,33 @@ export default function Checkout() {
                 <div className="mt-4 pt-4 border-t border-[hsla(174,70%,55%,0.15)] space-y-2 text-sm">
                   <Row k="Subtotal" v={formatRupiah(subtotal)} />
                   <Row k="Ongkir" v={shipping === 0 ? "Gratis" : formatRupiah(shipping)} />
+                  {voucher && (
+                    <div className={`flex items-start gap-2 text-xs p-2.5 rounded-lg ${voucherEligible ? "bg-[hsla(174,70%,55%,0.1)] border border-[hsla(174,70%,55%,0.25)]" : "bg-[hsla(8,89%,64%,0.1)] border border-[hsla(8,89%,64%,0.25)]"}`} data-testid="voucher-banner">
+                      <Gift className={`w-4 h-4 mt-0.5 flex-shrink-0 ${voucherEligible ? "text-[hsl(var(--reef-glow))]" : "text-[hsl(var(--reef-coral))]"}`} />
+                      <div className="flex-1">
+                        <div className="font-semibold">
+                          Voucher <span className="font-mono">{voucher}</span>
+                        </div>
+                        <div className="opacity-70 text-[11px] mt-0.5">
+                          {voucherEligible
+                            ? `Hemat ${formatRupiah(discount)} di total.`
+                            : `Min. belanja ${formatRupiah(MIN_VOUCHER_SUBTOTAL)} biar voucher aktif.`}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        data-testid="voucher-remove"
+                        onClick={() => { clearVoucher(); setVoucher(null); }}
+                        className="opacity-50 hover:opacity-100 p-0.5"
+                        aria-label="Hapus voucher"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                  {voucherEligible && (
+                    <Row k={`Diskon voucher`} v={`-${formatRupiah(discount)}`} />
+                  )}
                   <Row k="Total" v={formatRupiah(total)} bold testId="summary-total" />
                 </div>
                 <Button

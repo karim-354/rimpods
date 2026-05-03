@@ -10,6 +10,7 @@ import { Star, Sparkles, Droplets, Shield, Waves, ChevronRight, Truck, MessageCi
 import { toast } from "sonner";
 import { trackAddToCart } from "../lib/tracker";
 import UpsellModal from "../components/UpsellModal";
+import ExitIntentModal from "../components/ExitIntentModal";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -70,6 +71,7 @@ export default function Landing() {
       <Header onCartClick={() => setCartOpen(true)} />
       <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
       <UpsellModal open={!!upsellTarget} onOpenChange={(o) => !o && setUpsellTarget(null)} target={upsellTarget} />
+      <ExitIntentModal />
 
       {/* HERO */}
       <section className="relative overflow-hidden">

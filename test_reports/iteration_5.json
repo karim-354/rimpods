@@ -1,0 +1,33 @@
+{
+  "summary": "Iter 5 testing — Paket Hemat user-asset image, FIRSTBUY20K voucher (flat Rp20.000, min Rp100.000), upsell countdown sessionStorage persistence, exit-intent modal. Backend 8/8 PASS (test_v5_voucher_image.py). Frontend 6/6 PASS: paket-hemat image=f12ycsla, upsell timestamp persists across modal re-opens (09:57→09:51 with same ts key for tbn-turn-back-nutrients), exit-intent fires on mouseout clientY=0 after 4s arm, claim saves FIRSTBUY20K + sets seen flag, modal skipped when voucher already saved, checkout banner shows + Diskon -Rp20.000 row + total math correct (129999+18000-20000=127999), voucher cleared from localStorage after successful order.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v5_voucher_image.py",
+    "/app/test_reports/pytest/iter5_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Voucher math: backend caps discount via min(flat, subtotal) so total never goes negative pre-shipping. Good.",
+    "Voucher code is normalised to upper-stripped server-side; lowercase 'firstbuy20k' from client also accepted. Verified.",
+    "Frontend Checkout sends voucher_code only when voucherEligible=true (subtotal>=100k). If user reaches checkout with subtotal<100k, banner shows ineligible message. Cannot live-test ineligible path because no single product < Rp100.000 in catalog and qty>=1; logical/code inspection confirms branch.",
+    "ExitIntentModal arm timer 4s + mouseout clientY<=0 + !relatedTarget — correct desktop UX. Mobile fallback 25s timeout requires window.innerWidth<=768; not tested live but logic OK.",
+    "UpsellModal sessionStorage key is per-target id (rimpods_upsell_ts_<id>), so two products that share the same upsell_target (rotifer + paket-hemat both -> tbn) correctly share the same countdown. Verified.",
+    "Carryover (iter4): tiktok_shop_url still uses search?q=... placeholders — not blocker for v5 but ship-fix before prod.",
+    "Carryover (iter4): backend 'POST /api/orders' accepts product_id with -bundle suffix (added in iter4 via _resolve_cart_item). Confirmed still works (179100 from base 199000)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_v5_voucher_image.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "none required",
+  "seed_data_creation": "TEST_-prefixed orders inserted into mongo via /api/orders during pytest + 1 playwright order. No cleanup performed (orders collection only).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iter 5 verifies: (1) products/paket-hemat-5r-1p image=customer-assets f12ycsla_, image_alt=h18wqlnd_ (2) VOUCHERS dict has FIRSTBUY20K=(20000,100000); /api/orders returns discount, voucher_code, total = sub - disc + ship; whatsapp_url contains '-Rp20.000' line and 'FIRSTBUY20K' code (3) UpsellModal persists per-target start ts in sessionStorage rimpods_upsell_ts_<id>, timer doesn't reset on re-open (4) ExitIntentModal: armed 4s, fires on mouseout top, claim writes localStorage rimpods_voucher_v1=FIRSTBUY20K + sessionStorage rimpods_exit_intent_seen=1, skip on either flag set (5) Checkout shows voucher banner, eligible branch shows Diskon row, ineligible branch shows min-belanja copy, voucher cleared via clearVoucher() after successful order. Note: catalog lacks a sub-Rp100k product so ineligible-path live test is logical-only.",
+  "rca of the issue": "N/A — all flows green."
+}
