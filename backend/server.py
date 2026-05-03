@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from urllib.parse import quote
 
 from fingerprint_check import check as fp_check, verify_before_publish
+from auth import build_auth_router
+from admin import build_admin_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -338,6 +340,11 @@ async def quick_check(payload: ContentCheckRequest):
 
 
 app.include_router(api_router)
+
+# === Google Auth (Emergent) + Admin Dashboard ===
+_auth_router, _current_user, _require_admin = build_auth_router(db)
+app.include_router(_auth_router)
+app.include_router(build_admin_router(db, _require_admin))
 
 app.add_middleware(
     CORSMiddleware,

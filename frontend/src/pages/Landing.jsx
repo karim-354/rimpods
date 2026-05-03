@@ -6,7 +6,7 @@ import { useCart, formatRupiah } from "../lib/cart";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
-import { Star, Sparkles, Droplets, Shield, Waves, ChevronRight, Truck, MessageCircle, Heart, ExternalLink } from "lucide-react";
+import { Star, Sparkles, Droplets, Shield, Waves, ChevronRight, Truck, MessageCircle, Heart, ExternalLink, Crown } from "lucide-react";
 import { toast } from "sonner";
 import { trackAddToCart } from "../lib/tracker";
 import UpsellModal from "../components/UpsellModal";
@@ -112,6 +112,25 @@ export default function Landing() {
               <Stat value="4.9★" label="Avg Review" />
               <Stat value="1rb+" label="Reefer Dipercaya" />
             </div>
+
+            <a
+              href={`https://wa.me/6282216594354?text=${encodeURIComponent("Halo Tim Rimpods, saya ingin berkonsultasi langsung mengenai setup pakan coral untuk tank saya. Mohon bantuannya.")}`}
+              target="_blank"
+              rel="noreferrer"
+              data-testid="hero-concierge-link"
+              className="mt-8 inline-flex items-center gap-3 group"
+            >
+              <span className="w-10 h-10 rounded-full bg-[hsla(45,85%,55%,0.12)] border border-[hsla(45,85%,55%,0.35)] grid place-items-center group-hover:bg-[hsla(45,85%,55%,0.2)] transition">
+                <Crown className="w-4 h-4 text-[hsl(var(--reef-glow))]" />
+              </span>
+              <div className="text-left">
+                <div className="text-xs uppercase tracking-[0.25em] opacity-60 group-hover:opacity-80">Concierge Line</div>
+                <div className="text-sm text-[hsl(var(--reef-foam))]/85 group-hover:text-[hsl(var(--reef-foam))]">
+                  Konsultasi langsung dengan tim kami
+                  <ChevronRight className="w-3.5 h-3.5 inline ml-1 opacity-60 group-hover:translate-x-0.5 transition" />
+                </div>
+              </div>
+            </a>
           </div>
 
           <div className="lg:col-span-5 relative rise-in">
