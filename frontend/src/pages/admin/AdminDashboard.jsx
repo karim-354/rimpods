@@ -5,6 +5,7 @@ import { fetchMe, logout, startGoogleLogin } from "../../lib/auth";
 import { Button } from "../../components/ui/button";
 import { LogOut, ShieldAlert, TrendingUp, ShoppingBag, Gift, Wallet, RefreshCcw } from "lucide-react";
 import { formatRupiah } from "../../lib/cart";
+import WhatsAppQuickActions from "../../components/admin/WhatsAppQuickActions";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -244,12 +245,13 @@ export default function AdminDashboard() {
                     <th className="text-left px-4 py-3">Voucher</th>
                     <th className="text-left px-4 py-3">Kanal</th>
                     <th className="text-left px-4 py-3">Status</th>
+                    <th className="text-left px-4 py-3">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {orders.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="text-center py-12 opacity-60">
+                      <td colSpan={9} className="text-center py-12 opacity-60">
                         Belum ada order masuk.
                       </td>
                     </tr>
@@ -279,6 +281,9 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-4 py-3 text-xs capitalize">{o.payment_channel}</td>
                         <td className="px-4 py-3 text-xs capitalize">{o.status || "pending"}</td>
+                        <td className="px-4 py-3">
+                          <WhatsAppQuickActions order={o} />
+                        </td>
                       </tr>
                     ))
                   )}

@@ -1,0 +1,30 @@
+{
+  "summary": "Iteration 8 (WhatsApp Quick Actions per order row in Admin Dashboard) tested end-to-end. Backend regression (iter-7 suite) 17/17 green — no regressions in auth, admin orders/stats, patch-status, or content endpoints. Frontend Playwright validated all 10 spec points: green WA pill rendered with testid 'wa-quick-btn-{id}'; disabled state (opacity-30 + cursor-not-allowed) for orders without contact.phone; dropdown with 4 testids (wa-tpl-confirm/address/shipping/followup); dropdown header shows first-name + normalized '62XXX' phone; confirm/address/followup each call window.open with correct wa.me/62... URL + URL-encoded bodies containing the required marker phrases and order_number; shipping dialog renders wa-tpl-field-kurir/resi/eta, preview substitutes all 3 placeholders, and wa-tpl-confirm-btn opens wa.me with filled body; wa-copy-confirm copies to clipboard without opening wa.me; iter-7 regressions (KPI x4, orders table, voucher breakdown, logout) still work. Phone normalization verified live for '0812-3456-7890' -> '6281234567890' via dropdown header; '62…' and '8…' branches verified by static code review (3-branch normalizePhoneID is trivial).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v7_admin_auth.py",
+    "/app/test_reports/pytest/iter8_regression.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "WhatsAppQuickActions.jsx is well-scoped (~230 lines, below 700 threshold) — single file is fine.",
+    "normalizePhoneID correctly handles 3 Indonesian formats ('62…', '0…', '8…'); falls through unchanged for anomalies (acceptable — button simply disables if resulting string empty).",
+    "window.open called with 'noopener,noreferrer' — good security hygiene for untrusted wa.me redirects.",
+    "Copy-to-clipboard swallows errors silently with empty catch — consider showing a toast on failure for UX, but non-blocking.",
+    "ShippingTemplateDialog: values state is initialised once via useState lazy-init; if the dialog is opened for different orders within the same mount, prior KURIR/RESI/ETA values would persist. Low risk (one dialog per WA component instance, each row has its own), but could add a useEffect reset on `open` change for robustness.",
+    "Dropdown item uses nested <button> for copy inside the DropdownMenuItem — works but invalid HTML (button-in-button). Consider switching the outer container to a div with role='menuitem'. Not a functional blocker — copy still functions correctly and does not close dropdown."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (17/17 regression)", "frontend": "100% (10/10 iter-8 checks)"},
+  "test_credentials": "Admin session injected via mongosh (email=admin@rimpods.test). Cleanup executed post-run.",
+  "seed_data_creation": "Seeded 2 orders (order_iter8_good with phone '0812-3456-7890' and order_iter8_nophone with empty phone) + 1 admin user + 1 user_session. All cleaned up after testing.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Playwright technique used to capture window.open: page.add_init_script() overrides window.open to push URLs into window.__openedUrls; then page.evaluate('window.__openedUrls') reads them after clicks. This works reliably for wa.me flows without needing a real popup listener. Reuse _inject_session from test_v7_admin_auth.py for any admin-auth-gated flows.",
+  "rca of the issue": "No issues found. Implementation matches spec."
+}
