@@ -26,17 +26,19 @@ User clarifications:
 - Reefer panik: tank crash, butuh TBN segera
 
 ## What's Implemented (Dec 2025)
+### v1
 - Hero with stat block + marquee bar
 - 3 product cards with rating/sold/highlights/Tokopedia link
-- Cerita (brand story) section dengan grid feature
-- Cara Pakai (3-step guide)
-- Testimoni (3 reviews)
-- FAQ accordion (5 questions)
-- CTA card with WhatsApp + shop buttons
-- Cart drawer with qty controls + checkout CTA
-- Checkout form (name, phone, email, address, city, notes) + payment channel (WhatsApp / Tokopedia)
-- Success page with auto-redirect to chosen channel
+- Cerita, Cara Pakai, Testimoni, FAQ, CTA sections
+- Cart drawer + Checkout form + Success page
 - Anti-AI fingerprint check API + CLI
+
+### v2 (latest)
+- WhatsApp number live: +6282216594354 (env `RIMPODS_WHATSAPP`)
+- Brand logo Rimpods (gold + tagline) di header, sumber dari customer-assets
+- **Meta Pixel** sitewide id `354153630789298` — events: PageView, ViewContent (siap dipasang per produk), AddToCart, InitiateCheckout, Lead, Purchase
+- **TikTok Pixel** sitewide id `CNQDS3JC77U0SCE9DUUG` — events: page, ViewContent, AddToCart, InitiateCheckout, SubmitForm, CompletePayment (siap closing dari ads GMV Max TikTok Shop)
+- Helper `/app/frontend/src/lib/tracker.js` exposes `trackAddToCart`, `trackInitiateCheckout`, `trackLead`, `trackPurchase` — guarded against ad-blocker (no-throw)
 
 ## Backlog (P1/P2)
 - P1: Real photos dari Rimpods (sekarang pakai stock Unsplash)
