@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { CheckCircle2, MessageCircle, ExternalLink, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { formatRupiah } from "../lib/cart";
+import { trackPurchase } from "../lib/tracker";
 
 export default function Success() {
   const [order, setOrder] = useState(null);
@@ -18,6 +19,7 @@ export default function Success() {
     }
     const parsed = JSON.parse(raw);
     setOrder(parsed);
+    trackPurchase(parsed);
     // Auto-redirect setelah 1.2s ke channel pilihan
     if (parsed.channel === "whatsapp") {
       setTimeout(() => window.open(parsed.whatsapp_url, "_blank"), 1200);

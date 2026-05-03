@@ -8,6 +8,7 @@ import { Badge } from "../components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { Star, Sparkles, Droplets, Shield, Waves, ChevronRight, Truck, MessageCircle, Heart } from "lucide-react";
 import { toast } from "sonner";
+import { trackAddToCart } from "../lib/tracker";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -52,6 +53,7 @@ export default function Landing() {
 
   const handleAdd = (p) => {
     add(p, 1);
+    trackAddToCart(p, 1);
     toast.success(`${p.name.split("+")[0].trim()} masuk keranjang!`);
   };
 
@@ -354,7 +356,7 @@ export default function Landing() {
                 Belanja Sekarang
               </Button>
               <a
-                href="https://wa.me/6281234567890"
+                href="https://wa.me/6282216594354"
                 target="_blank"
                 rel="noreferrer"
                 data-testid="cta-wa-btn"
@@ -373,7 +375,7 @@ export default function Landing() {
           <div>© {new Date().getFullYear()} Rimpods. Live coral food, Bekasi.</div>
           <div className="flex gap-5">
             <a href="https://www.tokopedia.com/rimpods" target="_blank" rel="noreferrer" className="hover:text-[hsl(var(--reef-glow))]">Tokopedia</a>
-            <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer" className="hover:text-[hsl(var(--reef-glow))]">WhatsApp</a>
+            <a href="https://wa.me/6282216594354" target="_blank" rel="noreferrer" className="hover:text-[hsl(var(--reef-glow))]">WhatsApp</a>
           </div>
         </div>
       </footer>

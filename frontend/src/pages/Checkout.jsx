@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../components/Header";
@@ -10,6 +10,7 @@ import { Textarea } from "../components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { ChevronLeft, MessageCircle, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
+import { trackInitiateCheckout, trackLead } from "../lib/tracker";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -26,6 +27,11 @@ export default function Checkout() {
     notes: "",
   });
   const [channel, setChannel] = useState("whatsapp");
+
+  useEffect(() => {
+    if (items.length > 0) trackInitiateCheckout(items, total);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const setF = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -56,6 +62,7 @@ export default function Checkout() {
         channel,
       };
       sessionStorage.setItem("rimpods_last_order", JSON.stringify(orderInfo));
+      trackLead(data);
       clear();
       navigate("/sukses");
     } catch (err) {
