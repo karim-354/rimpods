@@ -24,14 +24,14 @@ export default function CartDrawer({ open, onOpenChange }) {
             Keranjang Kamu
           </SheetTitle>
           <SheetDescription className="text-[hsl(var(--reef-foam))]/60">
-            Cek pesanan kamu sebelum lanjut ke checkout.
+            Pastikan pilihan kamu sudah tepat sebelum lanjut ke checkout.
           </SheetDescription>
         </SheetHeader>
 
         {items.length === 0 ? (
           <div data-testid="cart-empty" className="mt-12 text-center text-[hsl(var(--reef-foam))]/70">
-            <p className="font-display text-xl">Masih kosong nih.</p>
-            <p className="text-sm mt-2">Pilih dulu pakan coral favorit kamu dari katalog.</p>
+            <p className="font-display text-xl">Keranjang kamu masih kosong.</p>
+            <p className="text-sm mt-2">Silakan pilih pakan coral yang paling selaras dengan tank kamu.</p>
           </div>
         ) : (
           <div className="mt-6 space-y-4">
@@ -77,7 +77,7 @@ export default function CartDrawer({ open, onOpenChange }) {
 
             <div className="pt-4 border-t border-[hsla(174,70%,55%,0.15)] space-y-2 text-sm">
               <div className="flex justify-between"><span className="opacity-70">Subtotal</span><span data-testid="cart-subtotal">{formatRupiah(subtotal)}</span></div>
-              <div className="flex justify-between"><span className="opacity-70">Ongkir (estimasi)</span><span>{shipping === 0 ? "Gratis" : formatRupiah(shipping)}</span></div>
+              <div className="flex justify-between"><span className="opacity-70">Pengiriman (estimasi)</span><span>{shipping === 0 ? "Gratis" : formatRupiah(shipping)}</span></div>
               <div className="flex justify-between text-base pt-1">
                 <span className="font-semibold">Total</span>
                 <span data-testid="cart-total" className="font-display text-xl text-[hsl(var(--reef-glow))]">{formatRupiah(total)}</span>
@@ -89,10 +89,10 @@ export default function CartDrawer({ open, onOpenChange }) {
               onClick={goCheckout}
               className="w-full coral-pill hover:opacity-90 h-12 rounded-full font-semibold text-base"
             >
-              Lanjut ke Checkout <ArrowRight className="w-4 h-4 ml-2" />
+              Lanjutkan ke Checkout <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
             <p className="text-[11px] text-center opacity-60">
-              Belanja Rp250rb up gratis ongkir Jabodetabek.
+              Belanja mulai Rp250.000, pengiriman Jabodetabek gratis ongkir.
             </p>
           </div>
         )}

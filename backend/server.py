@@ -32,8 +32,8 @@ PRODUCTS = [
     {
         "id": "rotifer-2l-phyto",
         "slug": "rotifera-2l-besar",
-        "name": "Rimpods Rotifera 2L BESAR + 1 Phytoplankton",
-        "tagline": "Untuk tank besar 400L+, coral mekar gila-gilaan",
+        "name": "Rimpods Rotifera 2L + Phytoplankton",
+        "tagline": "Nutrisi hidup untuk tank yang ingin lebih dari sekadar jernih.",
         "price": 129999,
         "compare_price": 159000,
         "rating": 4.9,
@@ -43,26 +43,27 @@ PRODUCTS = [
         "image": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/kvng7upw_a1.jpeg",
         "image_alt": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/r5m9fr4a_aa.jpeg",
         "tokopedia_url": "https://www.tokopedia.com/rimpods/rimpods-rotifera-2liter-besar-dengan-1-phytoplankton-ideal-untuk-coral-mekar-dalam-tank-besar-1731802588285273240",
-        "tiktok_shop_url": "https://www.tiktok.com/search?q=Rimpods+Rotifera+2L+Phytoplankton",
+        "tiktok_shop_url": "https://shop-id.tokopedia.com/view/product/1731802588285273240?encode_params=MIIBPwQM1nt56rSgUGmzMv8TBIIBGwaUatQ26awirmatcvftdKZiMMCLdfwPP0Vt_jjIWQWI7c_AvEPiFZyNqPCi3Kp1qWOsrDWvt8J_5nsDA5NgnjVFS0AA1-kxfjcCegpoAegD7Afld469BIBHbb7750vkS2xOOpgKRMdr_PVqIMAh4o42h0RZZfXOsqHH_SKAOzSSEMq7oIMlyvvb2HxTPj3GibfGrIZIKDUYgt8o5ZXUXctEIKqGNgNe8uHJ15NVZGRlEE3OhygovK3Q6CbdPb0_FMF-VzwsEE-KYyf1mBVcRllRsYwWFxWi_d5BiAExtoGzo9Y5qiST06mn60ctavRonXxtJq2uBmFmL5r2sJByYXG_h2EeUe3-F7NSVW-yqTRO-rkNK6LY-v7O8aYEEDVEKVjohiI_MkEolKE7WMo%3D",
         "upsell_target": "tbn-turn-back-nutrients",
         "highlights": [
-            "Sekali tuang langsung berasa, tank 400L+ kebanjiran nutrisi mikro hidup",
-            "Sudah termasuk 1 botol Phytoplankton bonus",
-            "Coral SPS, LPS, Soft, semua suka",
-            "Pengiriman dari Bekasi, dipacking khusus biar rotifer tetap hidup",
+            "Kultur live dari fasilitas Bekasi, dipanen saat kesegarannya paling matang",
+            "Satu paket lengkap: 2 liter rotifer aktif plus 1 botol phytoplankton pendamping",
+            "Selaras untuk SPS, LPS, dan soft coral — satu formula untuk seluruh koloni",
+            "Dikemas dengan metode suhu-terjaga, agar sampai di tangan kamu masih hidup",
         ],
         "description": (
-            "Inget ya, rotifer ini bikin coral kamu mekar sampe gila-gilaan. "
-            "Tank kepenuhan karena coral gendut-gendut bukan tanggung jawab kami, hehe. "
-            "Cocok buat reefer yang punya display tank ukuran besar dan pengen lihat polip "
-            "ekstensi maksimal. Takaran simpel: tank 400 liter ke atas, tuang 2 liter sekaligus."
+            "Tank dengan kapasitas di atas 400 liter punya ritme yang khas: ruang yang luas, "
+            "arus yang dinamis, dan coral yang ingin merespons lebih ekspresif. Di titik itulah "
+            "rotifer 2 liter ini kami siapkan. Satu kali tuang, kamu akan melihat polip mulai "
+            "mencari, lalu memanjang dengan tenang. Tak perlu dramatisasi — hasilnya akan bicara "
+            "sendiri pada hari kedua dan ketiga."
         ),
     },
     {
         "id": "paket-hemat-5r-1p",
         "slug": "paket-hemat-5-rotifer-1-phyto",
         "name": "Paket Hemat 5 Rotifer + 1 Phytoplankton",
-        "tagline": "Stok bulanan, hemat banyak, cocok reefer rajin",
+        "tagline": "Ritual feeding yang tenang untuk reefer yang menjaga konsistensi.",
         "price": 549000,
         "compare_price": 649995,
         "rating": 4.9,
@@ -72,26 +73,27 @@ PRODUCTS = [
         "image": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/f12ycsla_WhatsApp%20Image%202026-05-03%20at%208.19.10%20PM%20%283%29.jpeg",
         "image_alt": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/h18wqlnd_WhatsApp%20Image%202026-05-03%20at%208.19.10%20PM%20%282%29.jpeg",
         "tokopedia_url": "https://www.tokopedia.com/rimpods/paket-hemat-5-rotifer-1-phytoplankton-rotifera-pakan-coral-food",
-        "tiktok_shop_url": "https://www.tiktok.com/search?q=Rimpods+Paket+Hemat+Rotifer",
+        "tiktok_shop_url": "https://shop-id.tokopedia.com/view/product/1729681104107505816?encode_params=MIIBPwQMtSyEzExlVv5-1n7BBIIBGzAUXHLTRG_vnYZLWo-tdTZh8mOnGI_-yYjw1_2fax1aV-gtHdLeOf0irSqA63YYRxYQQbDw5eopIeUY6po_T9YkMa56OOf4cNEiNROicGUyl3gwyM__DWLoh5hvNDpKWonYk6pTm4WNjPuhK5faLARdq6CrTuEDwee6GpePdtfVceNxZgtRfoDYwsA-ItNzSxUsFoT15Ma_ksplFTLK9VCxh8qqdNjwcEXeRUrzcszutaH7KAoXHrdkoIO9D3J95TZOKL1-QWGpEvEu7byRBV78nHlnsvHlJ-iJt7ZbMWPtf1VPjTjcjEC4LCBGiflcA_tb6_1vBkKPI-rDVZr_raWuOo3M4LRKCiFLTh-xs3YD9JOTtLBw7JnkriUEEJDrsMWZg6SUSTpWc4iyZM0%3D",
         "upsell_target": "tbn-turn-back-nutrients",
         "highlights": [
-            "5 botol rotifer + 1 botol phytoplankton, satu kirim aja",
-            "Hemat sampai Rp100rb dibanding beli satuan",
-            "Cocok feeding rutin selama 4-6 minggu",
-            "Live shrimp & coral bakal lebih aktif tiap dosing",
+            "Lima botol rotifer dan satu phytoplankton — stok yang cukup untuk satu siklus utuh",
+            "Hemat yang dihitung dengan rapi, tanpa kompromi pada kesegaran tiap botol",
+            "Simpan di kulkas, tuang sesuai jadwal, biarkan coral menemukan ritmenya sendiri",
+            "Pilihan banyak reefer yang menjaga display tank mereka setiap pekan",
         ],
         "description": (
-            "Buat kamu yang udah commit kasih makan coral tiap hari, paket ini paling worth. "
-            "Lima botol rotifer plus satu phyto, langsung tuang sesuai jadwal feeding. "
-            "Rasanya kayak langganan susu segar buat anak-anak coral kamu, tinggal masuk kulkas, "
-            "ambil kalau mau pakai."
+            "Kalau kamu sudah menemukan ritme feeding yang cocok untuk tank kamu, paket ini "
+            "dirancang untuk menjaga ritme itu tetap ringan. Lima botol rotifer dan satu "
+            "phytoplankton datang dalam satu kiriman yang rapi — siap menemani rutinitas "
+            "dosing kamu selama empat hingga enam minggu. Tidak ada yang terburu-buru, "
+            "tidak ada yang terlewat. Hanya konsistensi yang tenang."
         ),
     },
     {
         "id": "tbn-turn-back-nutrients",
         "slug": "turn-back-nutrients",
         "name": "Rimpods Turn Back Nutrients (TBN)",
-        "tagline": "Tank crash? Balikin fresh seperti baru",
+        "tagline": "Langkah tenang saat parameter air mulai bergeser.",
         "price": 199000,
         "compare_price": 229000,
         "rating": 5.0,
@@ -101,19 +103,21 @@ PRODUCTS = [
         "image": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/quds6vg4_WhatsApp%20Image%202026-05-03%20at%208.19.10%20PM%20%281%29.jpeg",
         "image_alt": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/y598w8ty_WhatsApp%20Image%202026-05-03%20at%208.19.08%20PM.jpeg",
         "tokopedia_url": "https://www.tokopedia.com/rimpods/rimpods-turn-back-nutrients-1729680758563637400",
-        "tiktok_shop_url": "https://www.tiktok.com/search?q=Rimpods+Turn+Back+Nutrients",
+        "tiktok_shop_url": "https://shop-id.tokopedia.com/view/product/1729680758563637400?encode_params=MIIBPwQMqbROjEM3BPHLuhnJBIIBG3uhbqbT5XCAw9NxrkY0TOfMuwVzgf7nroyqHalMgEFU-CepQc9GPBqvGT78nKS8rOav9rZzPpIwssJ0fYfP7nP7EWo3reZC8937ufvMyKXI9EldDd49nCsU5vjwzZ3nkfK-73vvQwAUi9QrUyp_7a33mERjsrknUxB1JS4EjxZo1UqIkmEeDjScWnWoQWNeIXAwXJDmtTLlf4N9j00N6f8PkhpJf8Jq4VV-u4vDv-t2tw2JP6csNUqYPisDbCbV13ZMZIDf6jynixQx7Odfms4rP57kFPjI42XyRHOV-e4G9zwIjJ0tgg2g3zBLzjUreCocHd0btJA6W96LhXy2uQREGzmwgzqd0Y4_1heOM-_374hBZEWrXS9mOYIEEBteNEV4QU9WvizaAjm5-KI%3D",
         "upsell_target": "rotifer-2l-phyto",
         "highlights": [
-            "Bantu reset parameter air pasca tank crash",
-            "Bekerja sama dengan filtrasi & water change",
-            "Aman buat coral, ikan, invertebrata",
-            "Simpan di kulkas biar awet",
+            "Diformulasikan untuk mendampingi stabilisasi air pasca perubahan signifikan",
+            "Bekerja berdampingan dengan filtrasi dan water change — bukan pengganti",
+            "Aman untuk koloni coral sensitif, ikan, dan invertebrata",
+            "Stok kami jaga terbatas, supaya setiap botol selalu dalam batch terbaru",
         ],
         "description": (
-            "Pernah tank tiba-tiba berubah keruh, parameter ngaco, coral mulai nutup? Tenang. "
-            "TBN bantu kamu balikin kondisi air ke fase fresh. Cek parameter, benerin filter, "
-            "water change 20-50 persen, ganti media, lalu tuang TBN. Setelah itu cek kualitas "
-            "air rutin tiap minggu biar nggak kejadian lagi."
+            "Ada momen ketika tank yang tenang tiba-tiba berubah ritmenya — air sedikit "
+            "keruh, parameter bergeser, polip mulai menutup. Pada momen itu, kamu butuh "
+            "langkah yang terukur, bukan panik. TBN hadir untuk membantu kamu mengembalikan "
+            "fase fresh secara bertahap: cek parameter, perbaiki filtrasi, lakukan water "
+            "change 20–50 persen, ganti media, lalu tuang TBN. Setelah itu, pantau kualitas "
+            "air secara rutin — dan biarkan tank kamu kembali menemukan ketenangannya."
         ),
     },
 ]
@@ -203,10 +207,10 @@ def _resolve_cart_item(pid: str):
 def _build_whatsapp_url(order_number: str, items: list, contact: dict, total: int,
                         discount: int = 0, voucher_code: Optional[str] = None) -> str:
     lines = [
-        "Halo Rimpods! Aku mau order nih:",
-        f"No order: *{order_number}*",
+        "Halo Tim Rimpods, saya ingin melanjutkan pemesanan berikut:",
+        f"No. Order: *{order_number}*",
         "",
-        "*Pesanan:*",
+        "*Detail Pesanan:*",
     ]
     for it in items:
         lines.append(f"- {it['name']} x{it['quantity']} = Rp{it['line_total']:,}".replace(",", "."))
@@ -216,12 +220,13 @@ def _build_whatsapp_url(order_number: str, items: list, contact: dict, total: in
         "",
         f"*Total:* Rp{total:,}".replace(",", "."),
         "",
-        "*Kirim ke:*",
+        "*Alamat Pengiriman:*",
         f"{contact['name']} ({contact['phone']})",
         f"{contact['address']}, {contact['city']}",
     ]
     if contact.get("notes"):
-        lines += ["", f"Catatan: {contact['notes']}"]
+        lines += ["", f"Catatan tambahan: {contact['notes']}"]
+    lines += ["", "Terima kasih, saya tunggu konfirmasinya."]
     msg = "\n".join(lines)
     return f"https://wa.me/{DEFAULT_WA}?text={quote(msg)}"
 

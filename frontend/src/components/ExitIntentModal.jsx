@@ -55,7 +55,7 @@ export default function ExitIntentModal() {
 
   const claim = () => {
     saveVoucher(VOUCHER_CODE);
-    toast.success(`Voucher ${VOUCHER_CODE} aktif! Diskon otomatis di checkout.`);
+    toast.success(`Voucher ${VOUCHER_CODE} tersimpan. Diskon otomatis aktif di checkout.`);
     setOpen(false);
   };
 
@@ -92,11 +92,11 @@ export default function ExitIntentModal() {
 
           <DialogHeader>
             <DialogTitle className="font-display text-3xl leading-tight text-left">
-              Eits, jangan cabut dulu!
+              Sebelum kamu pergi.
             </DialogTitle>
             <DialogDescription className="text-[hsl(var(--reef-foam))]/75 text-left mt-2 text-base">
-              Khusus buat reefer yang pertama kali mampir, ada voucher{" "}
-              <b className="text-[hsl(var(--reef-glow))]">{formatRupiah(VOUCHER_VALUE)}</b> buat order pertama kamu.
+              Izinkan kami memperkenalkan diri dengan layak. Sebagai sapaan untuk kunjungan pertamamu, kami siapkan voucher{" "}
+              <b className="text-[hsl(var(--reef-glow))]">{formatRupiah(VOUCHER_VALUE)}</b> untuk order pertamamu — tanpa syarat yang berbelit.
             </DialogDescription>
           </DialogHeader>
 
@@ -106,7 +106,7 @@ export default function ExitIntentModal() {
             className="mt-6 w-full group flex items-center justify-between gap-3 p-4 rounded-2xl bg-[hsla(192,55%,22%,0.6)] border border-dashed border-[hsla(174,70%,55%,0.4)] hover:border-[hsl(var(--reef-glow))] transition"
           >
             <div className="text-left">
-              <div className="text-xs uppercase tracking-widest opacity-60 mb-1">Kode voucher</div>
+              <div className="text-xs uppercase tracking-widest opacity-60 mb-1">Kode Voucher</div>
               <div className="font-mono font-bold text-2xl text-[hsl(var(--reef-glow))] tracking-wider">
                 {VOUCHER_CODE}
               </div>
@@ -129,18 +129,18 @@ export default function ExitIntentModal() {
             onClick={claim}
             className="coral-pill hover:opacity-90 h-12 rounded-full font-semibold w-full mt-5"
           >
-            Pakai Voucher & Belanja Sekarang
+            Simpan Voucher & Lanjut Belanja
           </Button>
           <button
             data-testid="exit-intent-decline"
             onClick={() => setOpen(false)}
             className="w-full mt-2 text-xs opacity-50 hover:opacity-80 py-2"
           >
-            Nggak usah, lain kali aja
+            Tidak, mungkin di lain waktu
           </button>
 
           <p className="mt-4 text-[11px] opacity-50 text-center leading-relaxed">
-            Berlaku 1× per customer, min. order Rp100.000. Otomatis diskon di checkout.
+            Berlaku 1× per pelanggan, minimum belanja Rp100.000. Diskon otomatis saat checkout.
           </p>
         </div>
       </DialogContent>

@@ -57,7 +57,7 @@ export default function Landing() {
   const handleAdd = (p) => {
     add(p, 1);
     trackAddToCart(p, 1);
-    toast.success(`${p.name.split("+")[0].trim()} masuk keranjang!`);
+    toast.success(`${p.name.split("+")[0].trim()} siap di keranjang kamu.`);
     // Trigger upsell after a short delay if there's a cross-sell target
     const targetId = p.upsell_target;
     if (targetId) {
@@ -81,13 +81,13 @@ export default function Landing() {
           <div className="lg:col-span-7 rise-in">
             <Badge data-testid="hero-badge" className="bg-[hsla(174,70%,55%,0.15)] text-[hsl(var(--reef-glow))] border border-[hsla(174,70%,55%,0.35)] rounded-full px-4 py-1 mb-6">
               <Sparkles className="w-3.5 h-3.5 mr-2" />
-              Pakan coral live, langsung kirim dari Bekasi
+              Pakan coral hidup — dikultur di Bekasi, dipersembahkan untuk reefer di seluruh Indonesia
             </Badge>
             <h1 data-testid="hero-title" className="font-display text-5xl sm:text-6xl lg:text-7xl leading-[1.02] tracking-tight">
-              Bikin coral kamu <span className="text-[hsl(var(--reef-coral))]">mekar</span> sampai gila-gilaan.
+              Tank yang <span className="text-[hsl(var(--reef-coral))]">hidup</span>, bukan sekadar indah.
             </h1>
             <p className="mt-6 text-lg max-w-xl text-[hsl(var(--reef-foam))]/80 leading-relaxed">
-              Rotifer hidup, phytoplankton segar, plus formula pemulih air pasca crash. Tank kamu nggak cuma cantik, tapi hidup. Beneran hidup.
+              Live rotifer, phytoplankton segar, dan formula pendamping pemulihan air — kami rawat dengan standar yang kami jaga sendiri. Untuk kamu yang memperhatikan detail, coral kamu akan bicara.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button
@@ -95,7 +95,7 @@ export default function Landing() {
                 onClick={() => document.getElementById("produk")?.scrollIntoView({ behavior: "smooth" })}
                 className="coral-pill hover:opacity-90 h-12 px-7 rounded-full font-semibold"
               >
-                Lihat Produk <ChevronRight className="w-4 h-4 ml-1" />
+                Jelajahi Produk <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
               <Button
                 data-testid="hero-story-btn"
@@ -103,14 +103,14 @@ export default function Landing() {
                 variant="outline"
                 className="bg-transparent border-[hsla(174,70%,55%,0.4)] text-[hsl(var(--reef-foam))] hover:bg-[hsla(174,70%,55%,0.1)] h-12 px-7 rounded-full"
               >
-                Kenapa Rimpods?
+                Kenali Rimpods
               </Button>
             </div>
 
             <div className="mt-10 grid grid-cols-3 gap-6 max-w-md">
               <Stat value="6.2K" label="Rating Toko" />
               <Stat value="4.9★" label="Avg Review" />
-              <Stat value="1rb+" label="Reefer Puas" />
+              <Stat value="1rb+" label="Reefer Dipercaya" />
             </div>
           </div>
 
@@ -125,8 +125,8 @@ export default function Landing() {
                 <div className="flex items-center gap-3">
                   <Heart className="w-5 h-5 text-[hsl(var(--reef-coral))]" />
                   <div>
-                    <div className="text-xs opacity-70">Reefer comment</div>
-                    <div className="text-sm">"Polip ekstensi maksimal dari hari ke-3."</div>
+                    <div className="text-xs opacity-70">Catatan reefer</div>
+                    <div className="text-sm">"Ekstensi polip terlihat maksimal sejak hari ketiga."</div>
                   </div>
                 </div>
               </div>
@@ -139,13 +139,13 @@ export default function Landing() {
           <div className="marquee-track text-sm uppercase tracking-[0.25em] opacity-70">
             {Array.from({ length: 2 }).map((_, k) => (
               <div key={k} className="flex gap-12">
-                <span>· Live Rotifer</span>
+                <span>· Live Rotifer Harian</span>
                 <span>· Phytoplankton Segar</span>
-                <span>· Coral Mekar Maksimal</span>
-                <span>· Tank Crash Rescue</span>
+                <span>· Coral yang Ekspresif</span>
+                <span>· Pemulih Pasca Perubahan Parameter</span>
                 <span>· 4.9★ di Tokopedia</span>
-                <span>· Kirim dari Bekasi</span>
-                <span>· Reefer Indonesia</span>
+                <span>· Dikirim dari Bekasi</span>
+                <span>· Komunitas Reefer Indonesia</span>
               </div>
             ))}
           </div>
@@ -160,9 +160,9 @@ export default function Landing() {
               <Badge className="bg-[hsla(8,89%,64%,0.15)] text-[hsl(var(--reef-coral))] border border-[hsla(8,89%,64%,0.4)] rounded-full px-4 py-1 mb-4">
                 Katalog
               </Badge>
-              <h2 data-testid="produk-title" className="font-display text-4xl lg:text-5xl tracking-tight">Tiga andalan, satu tujuan.</h2>
+              <h2 data-testid="produk-title" className="font-display text-4xl lg:text-5xl tracking-tight">Tiga pilihan, satu standar kualitas.</h2>
               <p className="mt-3 max-w-xl text-[hsl(var(--reef-foam))]/75">
-                Pilih yang paling cocok sama tank kamu. Ragu-ragu? Chat aja, kita bantu.
+                Setiap tank punya cerita berbeda. Kami bantu kamu menemukan yang paling selaras dengan ritme tank kamu — kalau masih ragu, langsung sapa kami di chat.
               </p>
             </div>
           </div>
@@ -215,7 +215,7 @@ export default function Landing() {
                       onClick={() => handleAdd(p)}
                       className="coral-pill hover:opacity-90 rounded-full px-5 h-11 font-semibold"
                     >
-                      + Keranjang
+                      + Masukkan Keranjang
                     </Button>
                   </div>
 
@@ -261,17 +261,17 @@ export default function Landing() {
               Cerita Kami
             </Badge>
             <h2 className="font-display text-4xl lg:text-5xl tracking-tight">
-              Karena reefer butuh pakan yang hidup, bukan cuma label.
+              Coral merespons kualitas, bukan janji.
             </h2>
             <p className="mt-5 text-[hsl(var(--reef-foam))]/80 leading-relaxed">
-              Kita kultur sendiri rotifer dan phytoplankton di Bekasi, dengan kontrol kualitas air yang ketat. Tiap botol dipanen segar, dipacking khusus biar nyampe rumah kamu masih hidup, dan siap dilahap polip-polip lapar.
+              Kami merawat kultur rotifer dan phytoplankton sendiri di fasilitas kami di Bekasi, dengan parameter air yang kami jaga seketat tank display kami. Tiap botol dipanen pada titik kesegarannya yang matang, lalu dikemas dengan metode yang kami uji sendiri — agar sampai di tank kamu, isinya masih hidup, masih aktif, dan siap ditemui polip yang menunggu.
             </p>
             <div className="mt-8 grid grid-cols-2 gap-5">
               {[
-                { icon: Droplets, t: "Live Culture", d: "Bukan beku, bukan kering. Hidup dan aktif." },
-                { icon: Shield, t: "Aman 100%", d: "Tested di tank kami sendiri." },
-                { icon: Waves, t: "Reef-Safe", d: "SPS, LPS, soft, semua aman." },
-                { icon: Truck, t: "Packing Khusus", d: "Tahan perjalanan H+1 ke seluruh Indonesia." },
+                { icon: Droplets, t: "Kultur Hidup", d: "Bukan beku, bukan kering. Aktif dan responsif di botol." },
+                { icon: Shield, t: "Terverifikasi", d: "Diuji dulu di tank kami, sebelum masuk ke tank kamu." },
+                { icon: Waves, t: "Selaras Reef", d: "Cocok untuk SPS, LPS, dan soft coral — tanpa kejutan." },
+                { icon: Truck, t: "Kemasan Terjaga", d: "Metode kemasan kami menjaga kualitas sampai H+1 di seluruh Indonesia." },
               ].map((it, i) => (
                 <div key={i} className="flex gap-3">
                   <div className="w-10 h-10 rounded-xl bg-[hsla(174,70%,55%,0.15)] grid place-items-center text-[hsl(var(--reef-glow))]">
@@ -295,13 +295,13 @@ export default function Landing() {
             <Badge className="bg-[hsla(8,89%,64%,0.15)] text-[hsl(var(--reef-coral))] border border-[hsla(8,89%,64%,0.4)] rounded-full px-4 py-1 mb-4">
               Cara Pakai
             </Badge>
-            <h2 className="font-display text-4xl lg:text-5xl tracking-tight">Tiga langkah, coral langsung happy.</h2>
+            <h2 className="font-display text-4xl lg:text-5xl tracking-tight">Tiga langkah, dan coral akan bicara sendiri.</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { n: "01", t: "Cek volume tank", d: "Hitung liter air laut. Tank 400L+ pakai 2 liter rotifer sekaligus, tank kecil sesuaikan." },
-              { n: "02", t: "Tuang langsung", d: "Matikan skimmer 30 menit. Tuang rotifer + phyto pelan-pelan dekat aliran arus utama." },
-              { n: "03", t: "Pantau & ulangi", d: "Lihat polip ekstensi 2-3 hari. Lanjut feeding rutin tiap minggu untuk hasil maksimal." },
+              { n: "01", t: "Kenali volume tank kamu", d: "Hitung volume air yang aktif. Tank 400 liter ke atas, tuang 2 liter sekaligus. Tank lebih kecil, sesuaikan proporsinya dengan tenang." },
+              { n: "02", t: "Tuang dengan tenang", d: "Pause skimmer sekitar 30 menit. Alirkan rotifer dan phytoplankton dekat arus utama, biarkan sebaran mengalir secara alami." },
+              { n: "03", t: "Amati, lalu ulangi", d: "Perhatikan ekstensi polip pada hari ke-2 hingga ke-3. Lanjutkan ritme feeding mingguan — konsistensi yang akan memberi hasil." },
             ].map((s, i) => (
               <div key={i} className="glass-card rounded-2xl p-7">
                 <div className="font-display text-5xl text-[hsl(var(--reef-coral))] opacity-80">{s.n}</div>
@@ -320,13 +320,13 @@ export default function Landing() {
             <Badge className="bg-[hsla(174,70%,55%,0.15)] text-[hsl(var(--reef-glow))] border border-[hsla(174,70%,55%,0.3)] rounded-full px-4 py-1 mb-4">
               Suara Reefer
             </Badge>
-            <h2 className="font-display text-4xl lg:text-5xl tracking-tight">Nggak cuma kata kami.</h2>
+            <h2 className="font-display text-4xl lg:text-5xl tracking-tight">Reefer lain berkata begini.</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { n: "Bayu, Jakarta", q: "Polip Acro langsung mekar maksimal hari ke-3 setelah dosing rutin. Recommended banget sih!" },
-              { n: "Sari, Surabaya", q: "Tank pernah crash, pakai TBN parameter balik normal dalam seminggu. Ngebantu banget kok." },
-              { n: "Reza, Bandung", q: "Paket hemat worth it. Kulkas penuh, coral kenyang. Beneran investasi buat reefer rajin." },
+              { n: "Bayu, Jakarta", q: "Acro saya menunjukkan ekstensi polip yang ekspresif sejak hari ketiga. Konsistensinya yang saya apresiasi." },
+              { n: "Sari, Surabaya", q: "Saat parameter air saya sempat bergeser, TBN membantu mengembalikan ketenangan di tank. Terima kasih, Rimpods." },
+              { n: "Reza, Bandung", q: "Paket hemat menjadi pilihan rutin saya. Satu kiriman, satu bulan tenang, dan coral terlihat benar-benar nyaman." },
             ].map((t, i) => (
               <figure key={i} className="glass-card rounded-2xl p-7">
                 <div className="flex gap-1 mb-3">
@@ -346,15 +346,15 @@ export default function Landing() {
       <section id="faq" className="py-24 lg:py-32">
         <div className="max-w-3xl mx-auto px-5 lg:px-10">
           <div className="text-center mb-12">
-            <h2 className="font-display text-4xl lg:text-5xl tracking-tight">Pertanyaan yang sering muncul.</h2>
+            <h2 className="font-display text-4xl lg:text-5xl tracking-tight">Pertanyaan yang sering dititipkan.</h2>
           </div>
           <Accordion type="single" collapsible className="space-y-3" data-testid="faq-accordion">
             {[
-              { q: "Rotifer ini hidup pas nyampe rumah?", a: "Iya banget. Kita pack pakai metode khusus biar rotifer tetap aktif sampai 48-72 jam dalam perjalanan. Begitu nyampe, langsung tuang aja ke tank." },
-              { q: "Bisa disimpan di kulkas?", a: "Phytoplankton dan TBN bisa masuk kulkas. Rotifer hidup sebaiknya langsung dipakai biar nutrisinya maksimal, tapi kalau perlu, simpan max 3-5 hari di suhu 18-22°C." },
-              { q: "Cocok buat tank brackish atau air tawar?", a: "Produk Rimpods difokuskan untuk reef tank air laut. Untuk freshwater, ada baiknya konsultasi dulu lewat WhatsApp ya." },
-              { q: "Ongkir gimana?", a: "Dikirim dari Bekasi pakai kurir kargo. Belanja Rp250rb up gratis ongkir Jabodetabek. Luar kota tetap aman, kita rapihin packing-nya." },
-              { q: "Bisa COD atau cicilan?", a: "Untuk pembelian via Tokopedia langsung, tersedia cicilan 0% dan promo bebas ongkir. Order via web ini diteruskan ke admin via WhatsApp atau langsung redirect ke listing Tokopedia." },
+              { q: "Rotifernya masih hidup saat sampai di rumah saya?", a: "Iya. Metode packing kami menjaga rotifer tetap aktif hingga 48–72 jam dalam perjalanan. Begitu sampai, kamu bisa langsung mengalirkannya ke tank tanpa perlu aklimatisasi panjang." },
+              { q: "Apakah bisa disimpan di kulkas?", a: "Phytoplankton dan TBN aman masuk kulkas. Rotifer sebaiknya digunakan segera agar nutrisinya terjaga maksimal. Bila perlu disimpan, 3–5 hari di suhu 18–22°C adalah jendela yang kami sarankan." },
+              { q: "Cocok untuk tank brackish atau air tawar?", a: "Formula Rimpods dirancang khusus untuk reef tank air laut. Untuk kebutuhan freshwater, silakan ngobrol dulu dengan kami di WhatsApp — kami bantu arahkan ke yang paling tepat." },
+              { q: "Bagaimana dengan pengiriman?", a: "Kami kirim dari Bekasi menggunakan kurir kargo terpilih. Mulai Rp250.000, pengiriman Jabodetabek gratis ongkir. Pengiriman luar kota tetap kami pantau hingga sampai dengan aman." },
+              { q: "Tersedia COD atau cicilan?", a: "Melalui Tokopedia tersedia opsi cicilan 0% dan berbagai promo resmi. Pesanan via website ini akan kami teruskan ke admin via WhatsApp, atau kamu dapat langsung menyelesaikan pembayaran di listing Tokopedia." },
             ].map((f, i) => (
               <AccordionItem
                 key={i}
@@ -375,9 +375,9 @@ export default function Landing() {
         <div className="max-w-5xl mx-auto px-5 lg:px-10">
           <div className="glass-card rounded-[2rem] p-10 lg:p-14 text-center relative overflow-hidden">
             <Bubbles />
-            <h2 className="font-display text-4xl lg:text-5xl tracking-tight relative">Tank kamu tinggal nunggu polip mekar.</h2>
+            <h2 className="font-display text-4xl lg:text-5xl tracking-tight relative">Tank kamu siap memperlihatkan potensinya.</h2>
             <p className="mt-4 max-w-xl mx-auto text-[hsl(var(--reef-foam))]/80 relative">
-              Mulai dari satu botol aja udah keliatan bedanya. Yuk pilih dulu, nanti kita bantu sampai coral kamu happy.
+              Mulai dari satu botol, polip akan memberi tahu selisihnya. Kami di sini menemani, sampai coral kamu benar-benar menemukan ritmenya.
             </p>
             <div className="mt-8 flex flex-wrap gap-3 justify-center relative">
               <Button
@@ -385,7 +385,7 @@ export default function Landing() {
                 onClick={() => document.getElementById("produk")?.scrollIntoView({ behavior: "smooth" })}
                 className="coral-pill hover:opacity-90 h-12 px-7 rounded-full font-semibold"
               >
-                Belanja Sekarang
+                Mulai Belanja
               </Button>
               <a
                 href="https://wa.me/6282216594354"
@@ -394,7 +394,7 @@ export default function Landing() {
                 data-testid="cta-wa-btn"
               >
                 <Button variant="outline" className="bg-transparent border-[hsla(174,70%,55%,0.4)] text-[hsl(var(--reef-foam))] hover:bg-[hsla(174,70%,55%,0.1)] h-12 px-7 rounded-full">
-                  <MessageCircle className="w-4 h-4 mr-2" /> Chat Admin
+                  <MessageCircle className="w-4 h-4 mr-2" /> Konsultasi dengan Kami
                 </Button>
               </a>
             </div>
@@ -404,7 +404,7 @@ export default function Landing() {
 
       <footer className="py-10 border-t border-[hsla(174,70%,55%,0.15)] text-sm text-[hsl(var(--reef-foam))]/60">
         <div className="max-w-7xl mx-auto px-5 lg:px-10 flex flex-col md:flex-row justify-between gap-3">
-          <div>© {new Date().getFullYear()} Rimpods. Live coral food, Bekasi.</div>
+          <div>© {new Date().getFullYear()} Rimpods. Dikultur dengan penuh perhatian di Bekasi.</div>
           <div className="flex gap-5">
             <a href="https://www.tokopedia.com/rimpods" target="_blank" rel="noreferrer" className="hover:text-[hsl(var(--reef-glow))]">Tokopedia</a>
             <a href="https://wa.me/6282216594354" target="_blank" rel="noreferrer" className="hover:text-[hsl(var(--reef-glow))]">WhatsApp</a>

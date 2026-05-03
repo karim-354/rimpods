@@ -32,7 +32,7 @@ export default function Success() {
 
   const copyOrder = () => {
     navigator.clipboard.writeText(order.order_number);
-    toast.success("Nomor order disalin!");
+    toast.success("Nomor order berhasil disalin.");
   };
 
   return (
@@ -43,13 +43,13 @@ export default function Success() {
           <div className="w-16 h-16 mx-auto rounded-full bg-[hsla(174,70%,55%,0.15)] grid place-items-center">
             <CheckCircle2 className="w-8 h-8 text-[hsl(var(--reef-glow))]" />
           </div>
-          <h1 className="font-display text-4xl mt-6 tracking-tight">Pesanan kamu udah masuk!</h1>
+          <h1 className="font-display text-4xl mt-6 tracking-tight">Terima kasih, pesanan kamu sudah kami terima.</h1>
           <p className="mt-3 opacity-75">
-            Sebentar lagi kita arahkan ke {order.channel === "whatsapp" ? "WhatsApp admin" : "Tokopedia"} untuk konfirmasi pembayaran. Kalau nggak terbuka otomatis, klik tombol di bawah.
+            Kami akan segera mengarahkanmu ke {order.channel === "whatsapp" ? "WhatsApp admin" : "Tokopedia"} untuk menyelesaikan konfirmasi. Jika laman tidak terbuka secara otomatis, silakan klik tombol di bawah.
           </p>
 
           <div className="mt-8 flex items-center justify-center gap-2">
-            <span className="text-sm opacity-60">No order:</span>
+            <span className="text-sm opacity-60">No. Order:</span>
             <code data-testid="order-number" className="font-mono text-sm bg-[hsla(192,55%,22%,0.5)] px-3 py-1 rounded-lg">{order.order_number}</code>
             <button onClick={copyOrder} className="opacity-60 hover:opacity-100" data-testid="copy-order-btn">
               <Copy className="w-4 h-4" />
@@ -70,7 +70,7 @@ export default function Success() {
             ) : (
               <a href={order.tokopedia_url} target="_blank" rel="noreferrer" data-testid="open-toko-btn">
                 <Button className="coral-pill hover:opacity-90 h-12 px-7 rounded-full font-semibold">
-                  <ExternalLink className="w-4 h-4 mr-2" /> Lanjut ke Tokopedia
+                  <ExternalLink className="w-4 h-4 mr-2" /> Lanjutkan ke Tokopedia
                 </Button>
               </a>
             )}

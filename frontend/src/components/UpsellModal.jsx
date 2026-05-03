@@ -50,7 +50,7 @@ export default function UpsellModal({ open, onOpenChange, target }) {
     };
     add(upsellProduct, 1);
     trackAddToCart(upsellProduct, 1);
-    toast.success(`Bundle deal! Hemat ${formatRupiah(saving)}`);
+    toast.success(`Bundle aktif. Kamu hemat ${formatRupiah(saving)}.`);
     onOpenChange(false);
   };
 
@@ -72,26 +72,26 @@ export default function UpsellModal({ open, onOpenChange, target }) {
         <div className="relative">
           <img src={target.image} alt={target.name} className="w-full h-44 object-cover" />
           <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 coral-pill rounded-full px-3 py-1 text-xs font-bold">
-            <Sparkles className="w-3 h-3" /> Sering Dibeli Bareng
+            <Sparkles className="w-3 h-3" /> Rekomendasi dari Kami
           </div>
         </div>
         <div className="p-6">
           <DialogHeader>
             <DialogTitle className="font-display text-2xl leading-tight text-left">
-              Lengkapi paketnya yuk?
+              Izinkan kami melengkapinya.
             </DialogTitle>
             <DialogDescription className="text-[hsl(var(--reef-foam))]/75 text-left mt-2">
-              Tambah <b className="text-[hsl(var(--reef-glow))]">{target.name.split("(")[0].trim()}</b> sekalian, hemat 10% cuma di paket bundle ini.
+              Banyak reefer menambahkan <b className="text-[hsl(var(--reef-glow))]">{target.name.split("(")[0].trim()}</b> pada saat yang sama — kombinasinya memang selaras. Kami tawarkan selisih 10% khusus bila kamu menambahkannya sekarang.
             </DialogDescription>
           </DialogHeader>
 
           <div className="mt-5 p-4 rounded-2xl bg-[hsla(192,55%,22%,0.5)] border border-[hsla(174,70%,55%,0.2)]">
             <div className="flex items-center justify-between mb-3 pb-3 border-b border-[hsla(174,70%,55%,0.15)]">
               <span className="text-xs uppercase tracking-widest opacity-60 inline-flex items-center gap-1.5">
-                <Clock className="w-3 h-3" /> Promo bundle berakhir dalam
+                <Clock className="w-3 h-3" /> Penawaran berlaku selama
               </span>
               <span data-testid="upsell-countdown" className={`font-mono text-lg font-bold ${expired ? "text-red-400" : "text-[hsl(var(--reef-coral))]"}`}>
-                {expired ? "Habis" : `${mm}:${ss}`}
+                {expired ? "Berakhir" : `${mm}:${ss}`}
               </span>
             </div>
             <div className="flex items-end justify-between">
@@ -113,7 +113,7 @@ export default function UpsellModal({ open, onOpenChange, target }) {
               disabled={expired}
               className="coral-pill hover:opacity-90 h-12 rounded-full font-semibold w-full disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <Plus className="w-4 h-4 mr-1" /> {expired ? "Promo Habis" : "Iya, Tambahin Sekalian"}
+              <Plus className="w-4 h-4 mr-1" /> {expired ? "Penawaran Berakhir" : "Ya, Lengkapi Paketnya"}
             </Button>
             <Button
               data-testid="upsell-decline"
@@ -121,7 +121,7 @@ export default function UpsellModal({ open, onOpenChange, target }) {
               onClick={() => onOpenChange(false)}
               className="h-10 text-[hsl(var(--reef-foam))]/60 hover:text-[hsl(var(--reef-foam))] hover:bg-transparent w-full"
             >
-              Nanti aja, lanjut checkout
+              Tidak perlu, lanjut checkout
             </Button>
           </div>
         </div>
