@@ -1,0 +1,26 @@
+{
+  "summary": "Iter 3 testing — TikTok Shop buttons + Smart Upsell Modal. Backend 2/2 PASS. Frontend: toko+tiktok links on all 3 cards with correct hrefs, upsell modal opens ~700ms after add-to-cart, discounted price 179100 vs 199000 shown for rotifer→TBN upsell and 116999 vs 129999 for TBN→rotifer upsell, upsell-accept/decline/close all working, cart drawer shows bundle line, pixels (fbq+ttq) loaded, order regression intact.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v3_upsell.py",
+    "/app/test_reports/pytest/iter3_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Intentional v1 quirk (already documented): when user already has the upsell target in cart, cart.add() merges by product_id and discards bundle price + '(Bundle -10%)' name silently. Consider using a distinct id like `${target.id}-bundle` for a cleaner UX, or show a toast explaining the merge.",
+    "tiktok_shop_url values are search placeholders (https://www.tiktok.com/search?q=...) — replace with actual TikTok Shop deep-links before prod.",
+    "Bundle discount is client-side only; backend /api/orders recomputes price from product_id so orders always use base price. Acceptable for v1 and documented."
+  ],
+  "updated_files": ["/app/backend/tests/test_v3_upsell.py"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iter 3 adds UpsellModal + TikTok Shop buttons. Backend exposes tiktok_shop_url + upsell_target on each product. Upsell triggers 700ms after add-to-cart. Bundle line uses same product_id → merges if target already in cart (documented). test_v3_upsell.py covers new backend fields + order regression.",
+  "rca of the issue": "N/A — no issues found."
+}

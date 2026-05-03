@@ -43,6 +43,8 @@ PRODUCTS = [
         "image": "https://images.unsplash.com/photo-1546026423-cc4642628d2b?w=900&q=80",
         "image_alt": "https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?w=900&q=80",
         "tokopedia_url": "https://www.tokopedia.com/rimpods/rimpods-rotifera-2liter-besar-dengan-1-phytoplankton-ideal-untuk-coral-mekar-dalam-tank-besar-1731802588285273240",
+        "tiktok_shop_url": "https://www.tiktok.com/search?q=Rimpods+Rotifera+2L+Phytoplankton",
+        "upsell_target": "tbn-turn-back-nutrients",
         "highlights": [
             "Sekali tuang langsung berasa, tank 400L+ kebanjiran nutrisi mikro hidup",
             "Sudah termasuk 1 botol Phytoplankton bonus",
@@ -70,6 +72,8 @@ PRODUCTS = [
         "image": "https://images.unsplash.com/photo-1564507004663-b6dfb3c824d5?w=900&q=80",
         "image_alt": "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=900&q=80",
         "tokopedia_url": "https://www.tokopedia.com/rimpods/paket-hemat-5-rotifer-1-phytoplankton-rotifera-pakan-coral-food",
+        "tiktok_shop_url": "https://www.tiktok.com/search?q=Rimpods+Paket+Hemat+Rotifer",
+        "upsell_target": "tbn-turn-back-nutrients",
         "highlights": [
             "5 botol rotifer + 1 botol phytoplankton, satu kirim aja",
             "Hemat sampai Rp100rb dibanding beli satuan",
@@ -97,6 +101,8 @@ PRODUCTS = [
         "image": "https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=900&q=80",
         "image_alt": "https://images.unsplash.com/photo-1559825481-12a05cc00344?w=900&q=80",
         "tokopedia_url": "https://www.tokopedia.com/rimpods/rimpods-turn-back-nutrients-1729680758563637400",
+        "tiktok_shop_url": "https://www.tiktok.com/search?q=Rimpods+Turn+Back+Nutrients",
+        "upsell_target": "rotifer-2l-phyto",
         "highlights": [
             "Bantu reset parameter air pasca tank crash",
             "Bekerja sama dengan filtrasi & water change",

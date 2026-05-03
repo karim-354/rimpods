@@ -6,9 +6,10 @@ import { useCart, formatRupiah } from "../lib/cart";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
-import { Star, Sparkles, Droplets, Shield, Waves, ChevronRight, Truck, MessageCircle, Heart } from "lucide-react";
+import { Star, Sparkles, Droplets, Shield, Waves, ChevronRight, Truck, MessageCircle, Heart, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { trackAddToCart } from "../lib/tracker";
+import UpsellModal from "../components/UpsellModal";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -43,6 +44,7 @@ const Stat = ({ value, label }) => (
 export default function Landing() {
   const [products, setProducts] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [upsellTarget, setUpsellTarget] = useState(null);
   const { add } = useCart();
 
   useEffect(() => {
@@ -55,12 +57,19 @@ export default function Landing() {
     add(p, 1);
     trackAddToCart(p, 1);
     toast.success(`${p.name.split("+")[0].trim()} masuk keranjang!`);
+    // Trigger upsell after a short delay if there's a cross-sell target
+    const targetId = p.upsell_target;
+    if (targetId) {
+      const target = products.find((x) => x.id === targetId);
+      if (target) setTimeout(() => setUpsellTarget(target), 700);
+    }
   };
 
   return (
     <div className="reef-grad min-h-screen text-[hsl(var(--reef-foam))]">
       <Header onCartClick={() => setCartOpen(true)} />
       <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
+      <UpsellModal open={!!upsellTarget} onOpenChange={(o) => !o && setUpsellTarget(null)} target={upsellTarget} />
 
       {/* HERO */}
       <section className="relative overflow-hidden">
@@ -206,6 +215,27 @@ export default function Landing() {
                     >
                       + Keranjang
                     </Button>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-[hsla(174,70%,55%,0.15)] flex gap-2">
+                    <a
+                      href={p.tokopedia_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      data-testid={`toko-link-${p.id}`}
+                      className="flex-1 text-center text-xs py-2 rounded-full border border-[hsla(174,70%,55%,0.3)] hover:bg-[hsla(174,70%,55%,0.1)] inline-flex items-center justify-center gap-1.5 transition"
+                    >
+                      <ExternalLink className="w-3 h-3" /> Tokopedia
+                    </a>
+                    <a
+                      href={p.tiktok_shop_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      data-testid={`tiktok-link-${p.id}`}
+                      className="flex-1 text-center text-xs py-2 rounded-full border border-[hsla(8,89%,64%,0.4)] hover:bg-[hsla(8,89%,64%,0.1)] inline-flex items-center justify-center gap-1.5 transition"
+                    >
+                      <ExternalLink className="w-3 h-3" /> TikTok Shop
+                    </a>
                   </div>
                 </div>
               </article>
