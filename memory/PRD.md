@@ -57,13 +57,20 @@ User clarifications:
 - **Rimpods 2L photo swap** ke asset Rimpods (`a1.jpeg` + `aa.jpeg` sebagai hover/alt)
 - **Backend bundle recognition** — POST `/api/orders` sekarang accept `${id}-bundle` product_id dan otomatis apply 10% discount + label `(Bundle -10%)` + flag `is_bundle: true`
 
+### v4 (Feb 2026 — Conversion Polish)
+- **Paket Hemat photo swap** ke asset asli Rimpods (Duo Maut + Saving Bundle)
+- **Upsell countdown persistence** — timestamp di `sessionStorage[rimpods_upsell_ts_${id}]`, tidak reset saat modal ditutup-buka
+- **Exit-intent popup** → voucher **FIRSTBUY20K** flat Rp20.000 off (min order Rp100.000). Trigger mouseout top viewport (desktop) / 25s timeout (mobile). Sekali per sesi.
+- **Voucher backend** — `POST /api/orders` accept `voucher_code`, validate min subtotal, include diskon di WA message. Order schema sekarang punya `discount` + `voucher_code` fields.
+- **Voucher frontend** — banner di Checkout (eligible/non-eligible state), auto-apply di payload, auto-clear setelah sukses, tombol remove manual.
+
 ## Test Status
-- Backend: 14/14 pytest pass (iteration_4: products, orders, shipping, bundle suffix, fingerprint)
-- Frontend: iteration_4 PASS — 3 cards render, rotifer image swapped, upsell modal + countdown ticking, bundle cart split verified, fbq/ttq pixels load
+- Backend: 22/22 pytest pass (iter 4 + iter 5)
+- Frontend: iter 4 & 5 PASS — semua flow end-to-end verified, no regressions
 
 ## Next Action Items
-1. Replace TikTok Shop search placeholders (`tiktok.com/search?q=...`) dengan TikTok Shop deep-link asli per produk
-2. Optional: persist upsell countdown `startTimestamp` ke sessionStorage biar urgency tidak reset kalau modal ditutup-buka
-3. P2: Admin dashboard untuk lihat order masuk
-4. P2: Email confirmation via Resend/SMTP
-5. P2: Stripe / Midtrans integration untuk payment di-page
+1. **Pending user input**: TikTok Shop deep-link URL asli per produk (sekarang masih `tiktok.com/search?q=...`)
+2. P2: Admin dashboard untuk lihat order masuk + redeemed voucher stats
+3. P2: Email confirmation via Resend/SMTP
+4. P2: Stripe / Midtrans integration untuk payment di-page
+5. P2: Multi-bahasa (English version)
