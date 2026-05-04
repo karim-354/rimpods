@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -15,6 +15,7 @@ from fingerprint_check import check as fp_check, verify_before_publish
 from auth import build_auth_router
 from admin import build_admin_router
 from payment import build_payment_router
+import email_service
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -254,7 +255,7 @@ async def get_product(product_id: str):
 
 
 @api_router.post("/orders", response_model=Order)
-async def create_order(payload: OrderCreate):
+async def create_order(payload: OrderCreate, background: BackgroundTasks):
     if not payload.items:
         raise HTTPException(status_code=400, detail="Keranjang kosong")
 
@@ -316,6 +317,12 @@ async def create_order(payload: OrderCreate):
     doc = order.model_dump()
     doc["created_at"] = doc["created_at"].isoformat()
     await db.orders.insert_one(doc)
+
+    # Fire-and-forget emails (non-blocking, graceful failure)
+    order_for_email = {**doc, "contact": contact_dict}
+    background.add_task(email_service.send_order_confirmation, order_for_email)
+    background.add_task(email_service.send_admin_new_order, order_for_email)
+
     return order
 
 

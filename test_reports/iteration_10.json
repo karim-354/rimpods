@@ -1,0 +1,39 @@
+{
+  "summary": "Iter-10 Resend email integration + /admin/orders/{id}/ship fully validated. 10/10 pytest cases in /app/backend/tests/test_v10_email.py pass (regression + email flows + admin ship). Graceful-degradation path verified out-of-band by blanking RESEND_API_KEY, restarting backend, creating an order — order returned 200 and logs emitted 'Resend not configured, skipping email to ocepjos@gmail.com' twice (order_confirmation + admin_new_order). Env restored afterwards.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v10_email.py",
+    "/app/test_reports/pytest/iter10_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "email_service._send uses resend.api_key module-global assignment per call — fine for current single-worker setup, but if multiple async tasks ran concurrently with different keys it would race. Current env has single RESEND_API_KEY so non-issue.",
+    "admin.py POST /orders/{id}/ship returns 200 with {ok:false, error:'Order tidak ditemukan'} on missing order instead of HTTP 404. Functional and consistent with sibling update_status endpoint, but inconsistent with REST conventions — spec explicitly requested this shape so accepted.",
+    "payment.py webhook uses asyncio.create_task(send_payment_success(...)) WITHOUT keeping a reference; if the event loop is busy at shutdown, the task could be GC'd. In practice (FastAPI long-lived loop) the fire-and-forget is fine, but storing the task handle in a module-level set would be more defensive.",
+    "server.py uses FastAPI BackgroundTasks for order emails — correct non-blocking pattern. admin.py and payment.py use asyncio.create_task instead (no BackgroundTasks access there) — also valid.",
+    "email_service._send catches broad Exception and logs at ERROR — good, callers (BackgroundTasks/create_task) never see exceptions.",
+    "email_service.render_admin_notification WhatsApp phone normalization: the `elif not wa_phone.startswith('62')` branch is a no-op (assigns wa_phone to itself). Minor dead code — safe but noisy.",
+    "No unit test coverage for the HTML renderers themselves; behavior-driven log assertions suffice given the test-mode Resend sandbox. If future iterations add template variants, consider snapshot-testing render_* outputs."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_v10_email.py (new iter-10 suite, 10 tests)"
+  ],
+  "success_rate": {
+    "backend": "100% (10/10 pytest + graceful-degradation out-of-band confirmed)",
+    "frontend": "N/A (backend-only per review_request)"
+  },
+  "test_credentials": "Seeded rimpods@gmail.com user + session_token='test_session_iter10_1777870100157' via mongosh for ADMIN_BEARER. Both deleted post-run.",
+  "seed_data_creation": "1 admin user + 1 admin session (deleted after run). 7 test orders with contact.notes starting 'TEST_iter10' deleted from db.orders. Real Resend emails were dispatched to ocepjos@gmail.com (per review_request — that mailbox is the verified Resend test recipient).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All email flows are fire-and-forget: POST /orders uses FastAPI BackgroundTasks, webhook uses asyncio.create_task, /ship uses asyncio.create_task. Tests must sleep ~3-4s post-action then grep /var/log/supervisor/backend.err.log (logger writes to stderr by default) for 'Resend sent to <email>' or 'Resend not configured' patterns. Resend test mode caps TO address to account owner (ocepjos@gmail.com) — other recipients will 403 from Resend. Free tier is 2 req/sec; tests add 1.2s spacing between orders. Env key RESEND_API_KEY was temporarily blanked + backend restarted during graceful-degradation verification, then restored from /tmp/.env.backup.",
+  "rca of the issue": "N/A — all assertions passed."
+}

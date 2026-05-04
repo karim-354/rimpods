@@ -240,6 +240,17 @@ def build_payment_router(db) -> APIRouter:
             logger.warning("Midtrans webhook: order_number %s not found", order_number)
             return {"status": "order_not_found"}
 
+        # On successful payment, send confirmation email to customer (non-blocking)
+        if new_status == "paid":
+            try:
+                import email_service  # local import to avoid circular
+                import asyncio as _asyncio
+                updated_order = await db.orders.find_one({"order_number": order_number}, {"_id": 0})
+                if updated_order:
+                    _asyncio.create_task(email_service.send_payment_success(updated_order))
+            except Exception as e:
+                logger.warning("Failed to schedule payment_success email: %s", e)
+
         logger.info("Midtrans webhook processed: %s -> %s", order_number, new_status)
         return {"status": "ok", "new_status": new_status}
 

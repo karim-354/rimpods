@@ -85,4 +85,29 @@ def build_admin_router(db, require_admin) -> APIRouter:
         result = await db.orders.update_one({"id": order_id}, {"$set": {"status": status}})
         return {"ok": result.modified_count > 0}
 
+    @router.post("/orders/{order_id}/ship")
+    async def ship_order(order_id: str, courier: str, tracking: str, eta: str = "",
+                         admin=Depends(require_admin)):
+        """Mark order as shipped with courier/tracking/eta + trigger shipping email."""
+        import asyncio as _asyncio
+        import email_service
+
+        order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+        if not order:
+            return {"ok": False, "error": "Order tidak ditemukan"}
+
+        await db.orders.update_one(
+            {"id": order_id},
+            {"$set": {
+                "status": "shipped",
+                "shipping_courier": courier,
+                "shipping_tracking": tracking,
+                "shipping_eta": eta,
+            }},
+        )
+        refreshed = await db.orders.find_one({"id": order_id}, {"_id": 0})
+        if refreshed:
+            _asyncio.create_task(email_service.send_shipping(refreshed, courier, tracking, eta or "3-5 hari"))
+        return {"ok": True, "courier": courier, "tracking": tracking}
+
     return router
