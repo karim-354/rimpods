@@ -112,21 +112,38 @@ User clarifications:
 - **ADMIN_EMAILS** update ke `rimpods@gmail.com`
 - **Highlights & description** Paket Hemat diupdate: "4 botol Rotifer + 1 botol Phytoplankton, plus 1 botol Rotifer BONUS" (match Tokopedia)
 
-## Test Status
-- Backend: 59/59 pytest pass (iter 4–9 cumulative)
-- Frontend: 14/14 iter-9 Playwright checks PASS — Snap flow, webhook, admin regression verified
+### v9 (Feb 2026 — Email via Resend)
+- **Resend email integration** dengan 4 template branded (dark navy + coral accent, warm-premium Indonesian tone):
+  1. **Order Confirmation** — ke customer setelah order dibuat
+  2. **Payment Success** — otomatis ter-trigger saat webhook Midtrans confirm "paid"
+  3. **Shipping Notification** — ke customer saat admin hit POST `/api/admin/orders/{id}/ship` dengan courier+tracking+ETA
+  4. **Admin New Order** — notifikasi ke `EMAIL_ADMIN_NOTIFY` tiap ada order baru, include CTA "Chat di WhatsApp"
+- **Non-blocking**: FastAPI `BackgroundTasks` untuk order emails, `asyncio.create_task` untuk webhook/ship. Failure tidak block order flow.
+- **Graceful fallback**: jika `RESEND_API_KEY` kosong atau Resend API error, log warning + return None, order creation tetap sukses.
+- **HTML template** full inline CSS (email-client safe), branded header/footer dengan order number block, items table, summary rows, address block, CTA button.
+- **New endpoint**: `POST /api/admin/orders/{id}/ship?courier=JNE&tracking=CNT123&eta=3-5+hari` — admin-protected, update order status ke `shipped` + auto-kirim email resi
 
-## ⚠️ Known Config
-- `MIDTRANS_IS_PRODUCTION=false` — akun Midtrans Rimpods masih **pending approval** untuk production. Keys yang user provide bekerja di sandbox mode. Setelah akun approved, tinggal ubah flag di `/app/backend/.env` dan `/app/frontend/.env` jadi `true`.
-- `FRONTEND_MIDTRANS_IS_PRODUCTION` harus **match** backend flag (keduanya true atau keduanya false) supaya Snap.js URL + API key scope konsisten.
+## Test Status
+- Backend: 69/69 pytest pass (iter 4–10 cumulative)
+- Frontend: no changes (iter-10 backend-only)
+
+## ⚠️ Known Config (Resend Testing Mode)
+Akun Resend didaftarkan dengan `ocepjos@gmail.com`. Dalam **testing mode**, Resend hanya kirim ke alamat pemilik akun. Untuk production:
+1. Verify domain di https://resend.com/domains (tambah DNS records ke registrar)
+2. Setelah verified, ganti `RESEND_FROM_EMAIL` di `/app/backend/.env` dari `onboarding@resend.dev` ke `hello@yourdomain.com`
+3. `EMAIL_ADMIN_NOTIFY` bisa dikembalikan ke `rimpods@gmail.com` (atau email lain)
+4. Email customer akan otomatis terkirim ke alamat di `contact.email`
+
+Saat ini `EMAIL_ADMIN_NOTIFY=ocepjos@gmail.com` supaya testing bisa jalan. Restart backend setelah ganti env.
 
 ## Next Action Items
-1. **Pending**: Tunggu Midtrans approval production → switch `MIDTRANS_IS_PRODUCTION=true` di kedua `.env`
-2. **Pending**: Set Payment Notification URL di Midtrans dashboard ke `https://coral-product-hub.preview.emergentagent.com/api/payment/midtrans/notification` (atau URL production nanti)
-3. **Task 3 Pending**: Email SMTP (butuh kredensial SMTP dari user)
+1. **User**: verify domain di Resend (tambah DNS records) supaya email bisa kirim ke customer manapun
+2. **User**: tunggu Midtrans approval production, lalu switch `MIDTRANS_IS_PRODUCTION=true`
+3. **User**: login `/admin` via Google dengan `rimpods@gmail.com`
 
 ## Backlog
+- P2: Frontend — Poll `/api/payment/midtrans/status/{order_number}` di Success page realtime
+- P2: Frontend — Tombol "Kirim Resi" di admin dashboard row yang hit /ship endpoint
 - P2: Produk low-ticket untuk coverage voucher-ineligible
 - P2: English version
 - P2: Abandoned cart WhatsApp nudge
-- P2: Poll `/api/payment/midtrans/status/{order_number}` di Success page untuk status realtime
