@@ -422,8 +422,15 @@ export default function Landing() {
       </section>
 
       <footer className="py-10 border-t border-[hsla(174,70%,55%,0.15)] text-sm text-[hsl(var(--reef-foam))]/60">
-        <div className="max-w-7xl mx-auto px-5 lg:px-10 flex flex-col md:flex-row justify-between gap-3">
-          <div>© {new Date().getFullYear()} Rimpods. Dikultur dengan penuh perhatian di Bekasi.</div>
+        <div className="max-w-7xl mx-auto px-5 lg:px-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex items-center gap-3">
+            <img
+              src="https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/5gz4ojsf_Logo%20Transparant%20%284%29.png"
+              alt="Rimpods"
+              className="h-8 w-auto opacity-80"
+            />
+            <span>© {new Date().getFullYear()} · Dikultur dengan penuh perhatian di Bekasi</span>
+          </div>
           <div className="flex gap-5">
             <a href="https://www.tokopedia.com/rimpods" target="_blank" rel="noreferrer" className="hover:text-[hsl(var(--reef-glow))]">Tokopedia</a>
             <a href="https://wa.me/6282216594354" target="_blank" rel="noreferrer" className="hover:text-[hsl(var(--reef-glow))]">WhatsApp</a>

@@ -31,6 +31,8 @@ BRAND_COLORS = {
     "muted": "#6b9aac",
 }
 
+_LOGO_URL = "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/5gz4ojsf_Logo%20Transparant%20%284%29.png"
+
 _STYLE_WRAP = f"""
 <!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width"/>
 <title>Rimpods</title></head>
@@ -38,13 +40,18 @@ _STYLE_WRAP = f"""
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:{BRAND_COLORS['navy']};padding:24px 12px;">
 <tr><td align="center">
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="560" style="max-width:560px;background-color:{BRAND_COLORS['mid']};border-radius:18px;overflow:hidden;">
+<tr><td style="padding:28px 32px 4px;background-color:{BRAND_COLORS['navy']};" align="left">
+<img src="{_LOGO_URL}" alt="Rimpods" height="44" style="display:block;height:44px;width:auto;border:0;outline:none;" />
+</td></tr>
 """
 
 _STYLE_FOOTER = f"""
-<tr><td style="padding:24px 32px 28px;background-color:rgba(0,0,0,0.15);color:{BRAND_COLORS['muted']};font-size:11px;text-align:center;line-height:1.6;">
-<div style="margin-bottom:6px;letter-spacing:3px;text-transform:uppercase;font-weight:600;color:{BRAND_COLORS['foam']};">Rimpods</div>
+<tr><td style="padding:28px 32px 32px;background-color:rgba(0,0,0,0.25);text-align:center;">
+<img src="{_LOGO_URL}" alt="Rimpods" height="28" style="display:inline-block;height:28px;width:auto;border:0;outline:none;opacity:0.7;margin-bottom:12px;" /><br/>
+<div style="color:{BRAND_COLORS['muted']};font-size:11px;line-height:1.7;">
 Live coral food · Dikultur dengan penuh perhatian di Bekasi<br/>
 Balas email ini untuk berdiskusi langsung — kami mendengarkan.
+</div>
 </td></tr>
 </table>
 </td></tr></table>
@@ -54,9 +61,9 @@ Balas email ini untuk berdiskusi langsung — kami mendengarkan.
 
 def _header(eyebrow: str, title: str, intro: str) -> str:
     return f"""
-<tr><td style="padding:36px 32px 0;">
+<tr><td style="padding:24px 32px 0;background-color:{BRAND_COLORS['mid']};">
 <div style="letter-spacing:3px;text-transform:uppercase;color:{BRAND_COLORS['glow']};font-size:11px;font-weight:600;margin-bottom:12px;">{eyebrow}</div>
-<h1 style="margin:0 0 14px;color:{BRAND_COLORS['foam']};font-size:28px;font-weight:700;letter-spacing:-0.01em;">{title}</h1>
+<h1 style="margin:0 0 14px;color:{BRAND_COLORS['foam']};font-size:26px;font-weight:700;letter-spacing:-0.01em;line-height:1.25;">{title}</h1>
 <p style="margin:0;color:rgba(232,244,246,0.85);font-size:15px;line-height:1.65;">{intro}</p>
 </td></tr>
 """

@@ -150,7 +150,11 @@ export default function AdminDashboard() {
       <header className="border-b border-[hsla(174,70%,55%,0.15)] bg-[hsla(198,75%,8%,0.7)] backdrop-blur-md sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-5 lg:px-10 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-xs uppercase tracking-[0.25em] opacity-60">Rimpods</span>
+            <img
+              src="https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/5gz4ojsf_Logo%20Transparant%20%284%29.png"
+              alt="Rimpods"
+              className="h-8 w-auto"
+            />
             <span className="h-4 w-px bg-[hsla(174,70%,55%,0.3)]" />
             <span className="font-display text-lg">Admin Dashboard</span>
           </div>

@@ -3,7 +3,7 @@ import { ShoppingBag } from "lucide-react";
 import { useCart } from "../lib/cart";
 import { Button } from "./ui/button";
 
-const LOGO_URL = "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/sw1qbbsh_Logo%20Transparant.png";
+const LOGO_URL = "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/5gz4ojsf_Logo%20Transparant%20%284%29.png";
 
 export default function Header({ onCartClick }) {
   const { count } = useCart();
