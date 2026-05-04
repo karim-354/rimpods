@@ -1,9 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "../lib/cart";
+import { LOGO_WHITE_URL } from "../lib/brand";
 import { Button } from "./ui/button";
-
-const LOGO_URL = "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/5gz4ojsf_Logo%20Transparant%20%284%29.png";
 
 export default function Header({ onCartClick }) {
   const { count } = useCart();
@@ -23,7 +22,7 @@ export default function Header({ onCartClick }) {
     >
       <div className="max-w-7xl mx-auto px-5 lg:px-10 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 group" data-testid="brand-logo">
-          <img src={LOGO_URL} alt="Rimpods" className="h-11 lg:h-12 w-auto" />
+          <img src={LOGO_WHITE_URL} alt="Rimpods" className="h-11 lg:h-12 w-auto" />
         </Link>
 
         {onLanding && (

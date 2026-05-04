@@ -151,6 +151,7 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-5 lg:px-10 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
+              data-testid="admin-brand-logo"
               src="https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/5gz4ojsf_Logo%20Transparant%20%284%29.png"
               alt="Rimpods"
               className="h-8 w-auto"

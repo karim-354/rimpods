@@ -136,16 +136,26 @@ Akun Resend didaftarkan dengan `ocepjos@gmail.com`. Dalam **testing mode**, Rese
 
 Saat ini `EMAIL_ADMIN_NOTIFY=ocepjos@gmail.com` supaya testing bisa jalan. Restart backend setelah ganti env.
 
-### v10 (Feb 2026 — Production Email Domain)
-- **Domain `rimpods.com` verified di Resend** — email production sekarang aktif
+### v11 (Feb 2026 — Production Email Domain)
+- **Domain `rimpods.com` verified di Resend** — email production aktif
 - **Sender**: `Rimpods <Curhat@rimpods.com>` (brand voice warm & unik)
-- **Reply-to**: `rimpods@gmail.com` (inbox admin)
-- **EMAIL_ADMIN_NOTIFY**: `rimpods@gmail.com`
-- **Rate-limit retry**: email service sekarang retry sekali saat kena Resend 2 req/sec limit — all 4 concurrent emails bisa ter-kirim sukses walaupun di-fire bersamaan
+- **Reply-to** & **EMAIL_ADMIN_NOTIFY**: `rimpods@gmail.com`
+- **Rate-limit retry**: 1× auto-retry saat kena Resend 2 req/sec limit
+
+### v12 (Feb 2026 — Brand Logo Integration)
+- **Logo Rimpods** terintegrasi ke 5 touchpoints:
+  - 🌐 **Landing header** (sticky, sebelah kiri)
+  - 🌐 **Landing footer** (kiri bawah dengan copyright)
+  - 📊 **Admin dashboard header** (kiri atas)
+  - 📧 **Email template** (top header + footer, 4 template branded)
+  - 🔖 **Favicon + Apple touch icon** (tab browser)
+- **Meta tags Open Graph + Twitter** untuk social preview (`og:image`, `twitter:image`, `og:title`, `og:description`) pakai versi gold logo
+- **Brand assets terpusat** di `/app/frontend/src/lib/brand.js` (`LOGO_WHITE_URL`, `LOGO_GOLD_URL`, `LOGO_DARK_URL`, `BRAND` config) — future logo rotation = 1-line change
+- Theme color meta tag: `#082233` (navy brand color)
 
 ## Test Status
-- Backend: 69/69 pytest pass (iter 4–10) + email domain verification passed (4/4 concurrent delivery)
-- Frontend: no changes
+- Backend: 78/78 pytest pass (iter 4–11 cumulative)
+- Frontend: 9/9 iter-11 checks PASS (logo rendering, meta tags, regression)
 
 ## Next Action Items
 1. **User**: Login `/admin` via Google dengan `rimpods@gmail.com` untuk lihat dashboard
