@@ -30,7 +30,7 @@ export default function Checkout() {
     city: "",
     notes: "",
   });
-  const [channel, setChannel] = useState("whatsapp");
+  const [channel, setChannel] = useState("midtrans");
 
   useEffect(() => {
     const sync = () => setVoucher(getVoucher());

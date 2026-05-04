@@ -99,16 +99,34 @@ User clarifications:
   - Copy template ke clipboard tanpa buka WA (tombol copy per template)
   - Disabled state kalau customer tidak punya nomor valid
 
+### v8 (Feb 2026 — Midtrans Payment + Price Correction)
+- **Midtrans Snap** end-to-end payment integration
+  - Backend `/app/backend/payment.py`: Snap transaction creation, webhook handler dengan SHA512 signature verification (constant-time compare), status polling endpoint
+  - Frontend `/app/frontend/src/lib/midtrans.js`: Snap.js dynamic loader (idempotent), promise-based `paySnap()` wrapper
+  - Channel Midtrans jadi **default** di checkout — menggantikan WhatsApp sebagai opsi utama
+  - Support semua bank lokal (BCA/Mandiri/BNI/BRI/CIMB/BSI) via VA, QRIS, e-wallets (GoPay/OVO/DANA/ShopeePay), cicilan 0%
+  - Order schema nambah: `midtrans_token`, `midtrans_redirect_url`, `midtrans_transaction_id`, `midtrans_fraud_status`, `payment_type`, `paid_at`
+  - Success page dengan fallback "Lanjutkan Pembayaran" kalau popup ditutup user
+- **Paket Hemat price correction** — dari Rp549.000 (salah) ke Rp99.999 (+ compare_price Rp129.999 buat framing diskon ke depan)
+- **Rating update** — Paket Hemat: 2198 reviews, sold "3rb+" (sesuai data Tokopedia asli)
+- **ADMIN_EMAILS** update ke `rimpods@gmail.com`
+- **Highlights & description** Paket Hemat diupdate: "4 botol Rotifer + 1 botol Phytoplankton, plus 1 botol Rotifer BONUS" (match Tokopedia)
+
 ## Test Status
-- Backend: 45/45 pytest pass (iter 4–8 cumulative — iter 8 regression only)
-- Frontend: 10/10 iter-8 checks PASS, tidak ada regression
+- Backend: 59/59 pytest pass (iter 4–9 cumulative)
+- Frontend: 14/14 iter-9 Playwright checks PASS — Snap flow, webhook, admin regression verified
+
+## ⚠️ Known Config
+- `MIDTRANS_IS_PRODUCTION=false` — akun Midtrans Rimpods masih **pending approval** untuk production. Keys yang user provide bekerja di sandbox mode. Setelah akun approved, tinggal ubah flag di `/app/backend/.env` dan `/app/frontend/.env` jadi `true`.
+- `FRONTEND_MIDTRANS_IS_PRODUCTION` harus **match** backend flag (keduanya true atau keduanya false) supaya Snap.js URL + API key scope konsisten.
 
 ## Next Action Items
-1. **Pending user input**: Email admin Google asli (update `ADMIN_EMAILS` di `/app/backend/.env`)
-2. **Task 4 Pending — Midtrans**: butuh kredensial dari user (Server Key + Client Key + Merchant ID). Code skeleton siap diimplementasi saat keys tersedia.
-3. **Task 3 Pending — Email SMTP**: butuh SMTP host/port/user/pass
+1. **Pending**: Tunggu Midtrans approval production → switch `MIDTRANS_IS_PRODUCTION=true` di kedua `.env`
+2. **Pending**: Set Payment Notification URL di Midtrans dashboard ke `https://coral-product-hub.preview.emergentagent.com/api/payment/midtrans/notification` (atau URL production nanti)
+3. **Task 3 Pending**: Email SMTP (butuh kredensial SMTP dari user)
 
 ## Backlog
-- P2: Produk low-ticket (<Rp100k) untuk coverage voucher-ineligible
+- P2: Produk low-ticket untuk coverage voucher-ineligible
 - P2: English version
 - P2: Abandoned cart WhatsApp nudge
+- P2: Poll `/api/payment/midtrans/status/{order_number}` di Success page untuk status realtime
