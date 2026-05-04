@@ -252,14 +252,21 @@ async def _send(to_email: str, subject: str, html: str) -> Optional[str]:
     if reply_to:
         params["reply_to"] = reply_to
 
-    try:
-        res = await asyncio.to_thread(resend.Emails.send, params)
-        email_id = res.get("id") if isinstance(res, dict) else None
-        logger.info("Resend sent to %s (id=%s)", to_email, email_id)
-        return email_id
-    except Exception as e:
-        logger.error("Resend send failure to %s: %s", to_email, e)
-        return None
+    # Retry once on rate-limit (Resend free tier: 2 req/sec)
+    for attempt in (0, 1):
+        try:
+            res = await asyncio.to_thread(resend.Emails.send, params)
+            email_id = res.get("id") if isinstance(res, dict) else None
+            logger.info("Resend sent to %s (id=%s)", to_email, email_id)
+            return email_id
+        except Exception as e:
+            msg = str(e).lower()
+            if attempt == 0 and ("rate" in msg or "too many" in msg):
+                await asyncio.sleep(1.1)
+                continue
+            logger.error("Resend send failure to %s: %s", to_email, e)
+            return None
+    return None
 
 
 async def send_order_confirmation(order: dict) -> Optional[str]:

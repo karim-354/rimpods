@@ -136,12 +136,21 @@ Akun Resend didaftarkan dengan `ocepjos@gmail.com`. Dalam **testing mode**, Rese
 
 Saat ini `EMAIL_ADMIN_NOTIFY=ocepjos@gmail.com` supaya testing bisa jalan. Restart backend setelah ganti env.
 
-## Next Action Items
-1. **User**: verify domain di Resend (tambah DNS records) supaya email bisa kirim ke customer manapun
-2. **User**: tunggu Midtrans approval production, lalu switch `MIDTRANS_IS_PRODUCTION=true`
-3. **User**: login `/admin` via Google dengan `rimpods@gmail.com`
+### v10 (Feb 2026 — Production Email Domain)
+- **Domain `rimpods.com` verified di Resend** — email production sekarang aktif
+- **Sender**: `Rimpods <Curhat@rimpods.com>` (brand voice warm & unik)
+- **Reply-to**: `rimpods@gmail.com` (inbox admin)
+- **EMAIL_ADMIN_NOTIFY**: `rimpods@gmail.com`
+- **Rate-limit retry**: email service sekarang retry sekali saat kena Resend 2 req/sec limit — all 4 concurrent emails bisa ter-kirim sukses walaupun di-fire bersamaan
 
-## Backlog
+## Test Status
+- Backend: 69/69 pytest pass (iter 4–10) + email domain verification passed (4/4 concurrent delivery)
+- Frontend: no changes
+
+## Next Action Items
+1. **User**: Login `/admin` via Google dengan `rimpods@gmail.com` untuk lihat dashboard
+2. **User**: Tunggu Midtrans approval production → switch `MIDTRANS_IS_PRODUCTION=true`
+3. (Opsional) Cek inbox `rimpods@gmail.com` — harusnya udah ada email test dari `Curhat@rimpods.com`
 - P2: Frontend — Poll `/api/payment/midtrans/status/{order_number}` di Success page realtime
 - P2: Frontend — Tombol "Kirim Resi" di admin dashboard row yang hit /ship endpoint
 - P2: Produk low-ticket untuk coverage voucher-ineligible
