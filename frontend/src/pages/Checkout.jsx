@@ -8,10 +8,11 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
-import { ChevronLeft, MessageCircle, ShoppingBag, Gift, X } from "lucide-react";
+import { ChevronLeft, MessageCircle, ShoppingBag, Gift, X, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { trackInitiateCheckout, trackLead } from "../lib/tracker";
 import { getVoucher, clearVoucher, VOUCHER_VALUE } from "../lib/voucher";
+import { paySnap } from "../lib/midtrans";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const MIN_VOUCHER_SUBTOTAL = 100000;
@@ -81,6 +82,36 @@ export default function Checkout() {
       };
       sessionStorage.setItem("rimpods_last_order", JSON.stringify(orderInfo));
       trackLead(data);
+
+      // Midtrans path: fetch snap token then open popup
+      if (channel === "midtrans") {
+        try {
+          const { data: snap } = await axios.post(`${API}/payment/midtrans/snap-token`, {
+            order_id: data.id,
+          });
+          const res = await paySnap(snap.token, {
+            onSuccess: () => toast.success("Pembayaran berhasil!"),
+            onPending: () => toast.info("Menunggu pembayaran — cek email atau aplikasi bank kamu."),
+            onError: () => toast.error("Pembayaran gagal — silakan coba lagi."),
+          });
+          if (res.outcome === "closed") {
+            toast.info("Kamu bisa melanjutkan pembayaran dari halaman order.");
+          }
+          orderInfo.midtrans_token = snap.token;
+          orderInfo.midtrans_redirect_url = snap.redirect_url;
+          sessionStorage.setItem("rimpods_last_order", JSON.stringify(orderInfo));
+          clear();
+          if (voucherEligible) clearVoucher();
+          navigate("/sukses");
+          return;
+        } catch (err) {
+          console.error("Midtrans error:", err);
+          toast.error("Gagal membuka pembayaran Midtrans. Silakan pilih metode lain.");
+          setSubmitting(false);
+          return;
+        }
+      }
+
       clear();
       if (voucherEligible) clearVoucher();
       navigate("/sukses");
@@ -145,6 +176,7 @@ export default function Checkout() {
               <section className="glass-card rounded-2xl p-6">
                 <h2 className="font-display text-2xl mb-4">Metode Pembayaran</h2>
                 <RadioGroup value={channel} onValueChange={setChannel} className="space-y-3" data-testid="payment-channel">
+                  <ChannelOption value="midtrans" label="Bayar Sekarang (Midtrans)" desc="Pembayaran instan via BCA, Mandiri, BNI, BRI, CIMB, BSI (Virtual Account), QRIS, GoPay, OVO, DANA, ShopeePay, atau kartu kredit dengan cicilan 0%." current={channel} />
                   <ChannelOption value="whatsapp" label="Konfirmasi via WhatsApp" desc="Detail pesanan akan kami teruskan langsung ke admin Rimpods — pembayaran dilakukan melalui transfer manual." current={channel} />
                   <ChannelOption value="tokopedia" label="Lanjutkan di Tokopedia" desc="Kamu akan diarahkan ke listing Tokopedia untuk menyelesaikan pembayaran dengan metode resmi (cicilan 0%, COD, dan lainnya)." current={channel} />
                 </RadioGroup>
@@ -204,8 +236,15 @@ export default function Checkout() {
                   disabled={submitting}
                   className="w-full mt-5 coral-pill hover:opacity-90 h-12 rounded-full font-semibold"
                 >
-                  {submitting ? "Memproses..." : channel === "whatsapp" ? "Konfirmasi via WhatsApp" : "Lanjutkan ke Tokopedia"}
-                  {channel === "whatsapp" ? <MessageCircle className="w-4 h-4 ml-2" /> : null}
+                  {submitting
+                    ? "Memproses..."
+                    : channel === "whatsapp"
+                      ? "Konfirmasi via WhatsApp"
+                      : channel === "midtrans"
+                        ? "Bayar Sekarang"
+                        : "Lanjutkan ke Tokopedia"}
+                  {channel === "whatsapp" && <MessageCircle className="w-4 h-4 ml-2" />}
+                  {channel === "midtrans" && <CreditCard className="w-4 h-4 ml-2" />}
                 </Button>
                 <p className="text-[11px] mt-3 opacity-60 text-center">
                   Dengan menekan tombol ini, kamu menyetujui detail pesanan dikirim ke admin Rimpods.

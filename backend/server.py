@@ -14,6 +14,7 @@ from urllib.parse import quote
 from fingerprint_check import check as fp_check, verify_before_publish
 from auth import build_auth_router
 from admin import build_admin_router
+from payment import build_payment_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -66,29 +67,29 @@ PRODUCTS = [
         "slug": "paket-hemat-5-rotifer-1-phyto",
         "name": "Paket Hemat 5 Rotifer + 1 Phytoplankton",
         "tagline": "Ritual feeding yang tenang untuk reefer yang menjaga konsistensi.",
-        "price": 549000,
-        "compare_price": 649995,
+        "price": 99999,
+        "compare_price": 129999,
         "rating": 4.9,
-        "reviews": 312,
-        "sold": "500+",
-        "stock": 240,
+        "reviews": 2198,
+        "sold": "3rb+",
+        "stock": 98967,
         "image": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/f12ycsla_WhatsApp%20Image%202026-05-03%20at%208.19.10%20PM%20%283%29.jpeg",
         "image_alt": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/h18wqlnd_WhatsApp%20Image%202026-05-03%20at%208.19.10%20PM%20%282%29.jpeg",
         "tokopedia_url": "https://www.tokopedia.com/rimpods/paket-hemat-5-rotifer-1-phytoplankton-rotifera-pakan-coral-food",
         "tiktok_shop_url": "https://shop-id.tokopedia.com/view/product/1729681104107505816?encode_params=MIIBPwQMtSyEzExlVv5-1n7BBIIBGzAUXHLTRG_vnYZLWo-tdTZh8mOnGI_-yYjw1_2fax1aV-gtHdLeOf0irSqA63YYRxYQQbDw5eopIeUY6po_T9YkMa56OOf4cNEiNROicGUyl3gwyM__DWLoh5hvNDpKWonYk6pTm4WNjPuhK5faLARdq6CrTuEDwee6GpePdtfVceNxZgtRfoDYwsA-ItNzSxUsFoT15Ma_ksplFTLK9VCxh8qqdNjwcEXeRUrzcszutaH7KAoXHrdkoIO9D3J95TZOKL1-QWGpEvEu7byRBV78nHlnsvHlJ-iJt7ZbMWPtf1VPjTjcjEC4LCBGiflcA_tb6_1vBkKPI-rDVZr_raWuOo3M4LRKCiFLTh-xs3YD9JOTtLBw7JnkriUEEJDrsMWZg6SUSTpWc4iyZM0%3D",
         "upsell_target": "tbn-turn-back-nutrients",
         "highlights": [
-            "Lima botol rotifer dan satu phytoplankton — stok yang cukup untuk satu siklus utuh",
-            "Hemat yang dihitung dengan rapi, tanpa kompromi pada kesegaran tiap botol",
-            "Simpan di kulkas, tuang sesuai jadwal, biarkan coral menemukan ritmenya sendiri",
-            "Pilihan banyak reefer yang menjaga display tank mereka setiap pekan",
+            "4 botol Rotifer + 1 botol Phytoplankton, plus 1 botol Rotifer BONUS — total 5R + 1P",
+            "Stok yang cukup untuk satu siklus feeding yang rapi",
+            "Simpan di kulkas, tuang sesuai jadwal, biarkan coral menemukan ritmenya",
+            "Pilihan favorit reefer yang menjaga display tank mereka setiap pekan",
         ],
         "description": (
             "Kalau kamu sudah menemukan ritme feeding yang cocok untuk tank kamu, paket ini "
-            "dirancang untuk menjaga ritme itu tetap ringan. Lima botol rotifer dan satu "
-            "phytoplankton datang dalam satu kiriman yang rapi — siap menemani rutinitas "
-            "dosing kamu selama empat hingga enam minggu. Tidak ada yang terburu-buru, "
-            "tidak ada yang terlewat. Hanya konsistensi yang tenang."
+            "dirancang untuk menjaga ritme itu tetap ringan. Lima botol rotifer (4 botol + "
+            "1 botol bonus) dan satu phytoplankton datang dalam satu kiriman yang rapi — siap "
+            "menemani rutinitas dosing kamu selama beberapa minggu ke depan. Tidak ada yang "
+            "terburu-buru, tidak ada yang terlewat. Hanya konsistensi yang tenang."
         ),
     },
     {
@@ -345,6 +346,7 @@ app.include_router(api_router)
 _auth_router, _current_user, _require_admin = build_auth_router(db)
 app.include_router(_auth_router)
 app.include_router(build_admin_router(db, _require_admin))
+app.include_router(build_payment_router(db))
 
 app.add_middleware(
     CORSMiddleware,

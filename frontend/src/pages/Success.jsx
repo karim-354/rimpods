@@ -43,9 +43,15 @@ export default function Success() {
           <div className="w-16 h-16 mx-auto rounded-full bg-[hsla(174,70%,55%,0.15)] grid place-items-center">
             <CheckCircle2 className="w-8 h-8 text-[hsl(var(--reef-glow))]" />
           </div>
-          <h1 className="font-display text-4xl mt-6 tracking-tight">Terima kasih, pesanan kamu sudah kami terima.</h1>
+          <h1 className="font-display text-4xl mt-6 tracking-tight">
+            {order.channel === "midtrans"
+              ? "Terima kasih, pesanan kamu sudah dibuat."
+              : "Terima kasih, pesanan kamu sudah kami terima."}
+          </h1>
           <p className="mt-3 opacity-75">
-            Kami akan segera mengarahkanmu ke {order.channel === "whatsapp" ? "WhatsApp admin" : "Tokopedia"} untuk menyelesaikan konfirmasi. Jika laman tidak terbuka secara otomatis, silakan klik tombol di bawah.
+            {order.channel === "whatsapp" && "Kami akan segera mengarahkanmu ke WhatsApp admin untuk menyelesaikan konfirmasi. Jika laman tidak terbuka secara otomatis, silakan klik tombol di bawah."}
+            {order.channel === "tokopedia" && "Kami akan segera mengarahkanmu ke Tokopedia untuk menyelesaikan konfirmasi. Jika laman tidak terbuka secara otomatis, silakan klik tombol di bawah."}
+            {order.channel === "midtrans" && "Status pembayaran akan terupdate otomatis begitu pembayaran selesai. Bila popup pembayaran sempat tertutup, kamu dapat melanjutkan melalui tombol di bawah."}
           </p>
 
           <div className="mt-8 flex items-center justify-center gap-2">
@@ -61,16 +67,24 @@ export default function Success() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3 justify-center">
-            {order.channel === "whatsapp" ? (
+            {order.channel === "whatsapp" && (
               <a href={order.whatsapp_url} target="_blank" rel="noreferrer" data-testid="open-wa-btn">
                 <Button className="coral-pill hover:opacity-90 h-12 px-7 rounded-full font-semibold">
                   <MessageCircle className="w-4 h-4 mr-2" /> Buka WhatsApp Admin
                 </Button>
               </a>
-            ) : (
+            )}
+            {order.channel === "tokopedia" && (
               <a href={order.tokopedia_url} target="_blank" rel="noreferrer" data-testid="open-toko-btn">
                 <Button className="coral-pill hover:opacity-90 h-12 px-7 rounded-full font-semibold">
                   <ExternalLink className="w-4 h-4 mr-2" /> Lanjutkan ke Tokopedia
+                </Button>
+              </a>
+            )}
+            {order.channel === "midtrans" && order.midtrans_redirect_url && (
+              <a href={order.midtrans_redirect_url} target="_blank" rel="noreferrer" data-testid="open-midtrans-btn">
+                <Button className="coral-pill hover:opacity-90 h-12 px-7 rounded-full font-semibold">
+                  <ExternalLink className="w-4 h-4 mr-2" /> Lanjutkan Pembayaran
                 </Button>
               </a>
             )}

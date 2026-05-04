@@ -1,0 +1,41 @@
+{
+  "summary": "Iter-9 Midtrans Snap end-to-end + paket-hemat price update tested. Backend pytest 14/14 green. Frontend Playwright validated all 14 spec points: 3 channel options (midtrans first, whatsapp, tokopedia), Bayar Sekarang label only when channel=midtrans, full Midtrans flow (POST /api/orders -> POST /api/payment/midtrans/snap-token -> snap.pay invoked with token + 4 callbacks -> onClose -> navigate to /sukses -> sessionStorage rimpods_last_order contains midtrans_redirect_url -> Success heading 'Terima kasih, pesanan kamu sudah dibuat.' + open-midtrans-btn linking to https://app.sandbox.midtrans.com/snap/v4/redirection/...). Snap.js loader verified: injects single script with src=https://app.sandbox.midtrans.com/snap/snap.js + data-client-key=Mid-client-TebxcWipgaHb4QA1 + data-rimpods=snap (idempotent, 1 script in DOM after multiple calls). Webhook signature verification verified for all 5 status branches (settlement->paid, pending, deny->failed, cancel->cancelled, expire->expired) + signature-mismatch path leaves DB untouched. Admin whitelist for rimpods@gmail.com confirmed via direct curl (200) — non-whitelisted email correctly rejected with 401/403. Frontend .env adjusted to REACT_APP_MIDTRANS_IS_PRODUCTION=false to match backend sandbox mode.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Checkout", "issues": ["Default selected channel is 'whatsapp' (initial place-order-btn label = 'Konfirmasi via WhatsApp'). Spec phrase 'midtrans (default diatas)' is ambiguous — likely 'positioned at top' (which is the case) rather than 'initially selected'. If the intent is also to default-select Midtrans, change useState('whatsapp') -> useState('midtrans') in Checkout.jsx line 33."]},
+      {"screen": "Landing - Paket Hemat card", "issues": ["The compact card displays '4.9 · 3rb+ terjual' and does NOT explicitly render the '2.198 ulasan' count (only rating + sold). API returns reviews=2198 correctly. If the spec wants the review count visible on the landing card, ProductCard formatting needs an update."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v9_midtrans.py",
+    "/app/test_reports/pytest/iter9_results.xml"
+  ],
+  "action_items": [
+    "(Optional design) Decide whether 'midtrans' should be the default-selected channel (currently positioned first but whatsapp is initially selected).",
+    "(Optional design) Surface '2.198 ulasan' on the Paket Hemat landing card if user-visible review count is required (data already in API).",
+    "Pre-existing: test_v7_admin_auth.py uses hard-coded admin@rimpods.test which is no longer in ADMIN_EMAILS (now rimpods@gmail.com). Either update the test fixture or seed both emails. Direct curl-based regression confirmed admin endpoints work with rimpods@gmail.com — functionality is fine, test fixture is stale."
+  ],
+  "critical_code_review_comments": [
+    "payment.py uses constant-time signature comparison via XOR loop — good. Could simplify to hmac.compare_digest(expected, received) for clarity.",
+    "Snap webhook returns 200 on signature_mismatch (intentional, prevents Midtrans retry storm) — correct per Midtrans best-practice.",
+    "Snap order_id field for Midtrans = order_number (RMP-prefixed). Webhook lookup uses order_number — consistent.",
+    "midtrans.js paySnap wraps async/await inside Promise constructor (anti-pattern but functionally correct). Could refactor to plain async function returning a Promise.",
+    "Checkout.jsx submit handler calls paySnap then ALWAYS navigates to /sukses regardless of outcome (success/pending/closed). For 'success', redirect to /sukses is fine; consider polling /api/payment/midtrans/status/{order_number} on /sukses for real-time status display.",
+    "Success.jsx auto-redirects to whatsapp_url / tokopedia_url after 1.2s for those channels but NOT for midtrans (correct, since snap popup already handled it).",
+    "loadSnap idempotency works — verified by browser test (single script tag after multiple calls)."
+  ],
+  "updated_files": [
+    "/app/frontend/.env (REACT_APP_MIDTRANS_IS_PRODUCTION true -> false to match backend sandbox)",
+    "/app/backend/tests/test_v9_midtrans.py (new pytest suite, 14 tests)"
+  ],
+  "success_rate": {"backend": "100% (14/14 iter-9 + admin curl regression)", "frontend": "100% (14/14 iter-9 checks)"},
+  "test_credentials": "Admin session for regression curl: rimpods@gmail.com via Authorization Bearer header (cleaned up after run). Midtrans sandbox keys live in /app/backend/.env.",
+  "seed_data_creation": "1 admin user (rimpods@gmail.com) + 1 user_session for curl regression (deleted post-run). 6 test orders created during pytest with contact.notes='TEST_iter9' (deleted post-run).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Frontend .env now has REACT_APP_MIDTRANS_IS_PRODUCTION=false matching backend. Real Snap popup not opened during tests — instead, window.snap was monkey-patched via page.add_init_script before navigation to capture pay() invocation and trigger onClose synthetically. test_v7_admin_auth.py admin email is stale (admin@rimpods.test); ADMIN_EMAILS now whitelists only rimpods@gmail.com — adjust fixtures if rerunning. Order numbers in Midtrans are the RMP-prefixed order_number (not internal UUID id).",
+  "rca of the issue": "No iter-9 regressions. The 6 admin test failures in test_v7_admin_auth.py are a fixture/env mismatch (test seeds 'admin@rimpods.test' but ADMIN_EMAILS only allows 'rimpods@gmail.com' per the iter-9 spec). Verified separately via direct curl with a freshly-seeded rimpods@gmail.com session that admin endpoints return 200 — functionality is intact."
+}
