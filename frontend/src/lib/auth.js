@@ -4,8 +4,10 @@ import axios from "axios";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-// Send cookies with every request (session_token httpOnly cookie)
-axios.defaults.withCredentials = true;
+// NOTE: We deliberately DO NOT set axios.defaults.withCredentials = true globally,
+// because it forces every public request (e.g. /api/products) into credentials mode,
+// which breaks if backend CORS returns Access-Control-Allow-Origin: *.
+// Only auth-bound calls (below) opt-in to withCredentials per request.
 
 export const startGoogleLogin = () => {
   // Derive redirect dynamically from browser location — no hardcoding, no fallbacks.

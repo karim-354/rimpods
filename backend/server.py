@@ -355,13 +355,26 @@ app.include_router(_auth_router)
 app.include_router(build_admin_router(db, _require_admin))
 app.include_router(build_payment_router(db))
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+_cors_raw = os.environ.get("CORS_ORIGINS", "*")
+_cors_list = [o.strip() for o in _cors_raw.split(",") if o.strip()]
+# Browsers reject Access-Control-Allow-Origin: * when credentials are sent.
+# If wildcard is configured, fall back to allow_origin_regex to echo any origin.
+if _cors_list == ["*"] or "*" in _cors_list:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_credentials=True,
+        allow_origin_regex=".*",
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_credentials=True,
+        allow_origins=_cors_list,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 logging.basicConfig(
     level=logging.INFO,
