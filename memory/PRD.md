@@ -143,6 +143,34 @@ Saat ini `EMAIL_ADMIN_NOTIFY=ocepjos@gmail.com` supaya testing bisa jalan. Resta
 - **Rate-limit retry**: 1× auto-retry saat kena Resend 2 req/sec limit
 
 ### v12 (Feb 2026 — Brand Logo Integration)
+- Logo Rimpods ke Header, Footer, Admin Dashboard, Email template, Favicon + Apple touch icon
+- Meta OG + Twitter preview pakai logo gold
+- Brand assets terpusat di `/app/frontend/src/lib/brand.js`
+
+### v13 (Feb 2026 — Production Midtrans + Paid Shipping)
+- **Midtrans PRODUCTION mode active** — keys: `Mid-client-E0IGvMibArVXfy3U` + `Mid-server-KMT2CoI_jECmpWUq0oL6y_Em`, Merchant `M321126389`, `IS_PRODUCTION=true` di backend + frontend `.env`. Real transactions ready.
+- **Webhook test passed** by user via Midtrans Simulator (`settlement` notification with valid signature received & processed)
+- **Paid Shipping (3 couriers)** menggantikan free-shipping-if-Rp250k:
+  - Backend `/app/backend/shipping.py` — zone-based pricing per courier (Paxel/JNT/Tiki) dengan 4 zone Indonesia (Jabodetabek, Jawa, Sumatera+Bali, Indonesia Timur)
+  - Endpoint `GET /api/shipping/rates?city=&kecamatan=` → return 3 courier options (cost + ETD)
+  - Customer wajib pilih kurir sebelum checkout. Default ke kurir termurah otomatis.
+  - WhatsApp message include line `Pengiriman {Courier} {Service} = Rp{cost}`
+  - Order schema nambah `shipping_courier`, `shipping_service`, `shipping_etd`
+- **Frontend Checkout** — field Kecamatan baru, debounced rates fetch (400ms), RadioGroup courier selector dengan ETD info + harga, summary update otomatis on courier switch
+- **Image swap** — Hero (Instagram Carousel Perang Bakteri Koral 2026) + Cerita section (Dramatic 5-Photo Collage). Branded asset user upload.
+- **Cart drawer** — hapus copy "gratis ongkir Jabodetabek", row Pengiriman jadi "Pilih kurir di checkout"
+
+## Test Status
+- Backend: 88/88 pytest pass (iter 4–12 cumulative)
+- Frontend: 9/10 iter-12 (1 minor toast vs HTML5-required UX choice, functionally equivalent)
+
+## ⚠️ Live Mode Notes
+- Midtrans IS_PRODUCTION=true — semua call ke `/api/payment/midtrans/snap-token` akan trigger real transaction. Test orders bisa dibatalkan via Midtrans dashboard.
+- Pastikan Payment Notification URL di Midtrans dashboard sudah pointing ke `https://rimpods.com/api/payment/midtrans/notification`
+- Settlement T+1 ke rekening yang terdaftar di Midtrans.
+
+## Shipping Rate Tuning
+Admin dapat tune rates di `/app/backend/shipping.py` (dict `RATES`) per zone per courier. Restart backend + redeploy untuk apply.
 - **Logo Rimpods** terintegrasi ke 5 touchpoints:
   - 🌐 **Landing header** (sticky, sebelah kiri)
   - 🌐 **Landing footer** (kiri bawah dengan copyright)
