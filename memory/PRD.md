@@ -169,8 +169,19 @@ Saat ini `EMAIL_ADMIN_NOTIFY=ocepjos@gmail.com` supaya testing bisa jalan. Resta
 - Pastikan Payment Notification URL di Midtrans dashboard sudah pointing ke `https://rimpods.com/api/payment/midtrans/notification`
 - Settlement T+1 ke rekening yang terdaftar di Midtrans.
 
-## Shipping Rate Tuning
-Admin dapat tune rates di `/app/backend/shipping.py` (dict `RATES`) per zone per courier. Restart backend + redeploy untuk apply.
+### v14 (Feb 2026 — Weight-Aware Shipping + Premium Image Display)
+- **Per-product weight** ditambah ke katalog:
+  - Rimpods Rotifera 2L + Phyto: 3.0 kg
+  - Rimpods Paket Hemat 5R+1P: 2.0 kg
+  - Rimpods TBN: 0.7 kg
+- **Weight-aware shipping calculator** — rate struktur sekarang `first_kg` + `next_kg` per courier per zone. Cart total weight di-compute dari product.weight_kg × quantity, rounded UP ke nearest kg (min 1kg). Formula: `total = first_kg + (billable_kg - 1) × next_kg`
+- **POST /api/shipping/rates** sekarang accept `weight_kg` param. Order response include `shipping_weight_kg`.
+- **Frontend Checkout** — display "Berat paket: X.X kg" di shipping section, otomatis refetch rates saat cart weight change.
+- **Hero & Cerita images jadi premium** — `object-cover` diganti `object-contain` + `max-h` + soft dark background biar gambar utuh tampil, tidak terpotong. Aspect ratio asli image dipertahankan.
+
+## Test Status
+- Backend: 88/88 pytest pass + weight calc verified (3.7kg cart → 4kg billable → JNT Jakarta Rp33.000 = 15K + 3×6K)
+- Frontend: lint pass, smoke tested
 - **Logo Rimpods** terintegrasi ke 5 touchpoints:
   - 🌐 **Landing header** (sticky, sebelah kiri)
   - 🌐 **Landing footer** (kiri bawah dengan copyright)

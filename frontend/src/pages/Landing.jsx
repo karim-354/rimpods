@@ -134,11 +134,11 @@ export default function Landing() {
           </div>
 
           <div className="lg:col-span-5 relative rise-in">
-            <div className="glass-card glow-ring rounded-[2rem] p-3 rotate-1">
+            <div className="glass-card glow-ring rounded-[2rem] p-3 rotate-1 bg-[hsla(8,30%,15%,0.4)]">
               <img
                 src="https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/mfgdi1z2_Instagram%20Carousel%20Perang%20Bakteri%20Koral%202026.png"
                 alt="Reef tank coral mekar"
-                className="rounded-[1.6rem] w-full h-[420px] lg:h-[520px] object-cover"
+                className="rounded-[1.6rem] w-full h-auto object-contain max-h-[600px]"
               />
               <div className="absolute -bottom-6 -left-6 hidden lg:block glass-card rounded-2xl px-5 py-4">
                 <div className="flex items-center gap-3">
@@ -272,7 +272,7 @@ export default function Landing() {
             <img
               src="https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/wmdlkyuf_Dramatic%205-Photo%20Visual%20Collage.png"
               alt="Coral close up"
-              className="rounded-[1.8rem] w-full h-[460px] object-cover glow-ring"
+              className="rounded-[1.8rem] w-full h-auto object-contain max-h-[640px] glow-ring bg-[hsla(8,30%,15%,0.4)]"
             />
           </div>
           <div>

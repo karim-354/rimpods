@@ -46,7 +46,10 @@ export default function Checkout() {
     };
   }, []);
 
-  // Fetch shipping rates whenever city changes (debounced)
+  // Cart total weight (kg) from product.weight_kg fallback to 1kg
+  const cartWeight = items.reduce((s, i) => s + ((i.weight_kg || 1) * i.quantity), 0);
+
+  // Fetch shipping rates whenever city / kecamatan / cart weight changes (debounced)
   useEffect(() => {
     const c = (form.city || "").trim();
     if (c.length < 3) {
@@ -57,11 +60,15 @@ export default function Checkout() {
     const t = setTimeout(async () => {
       setShippingLoading(true);
       try {
-        const params = new URLSearchParams({ city: c, kecamatan: form.kecamatan || "", address: form.address || "" });
+        const params = new URLSearchParams({
+          city: c,
+          kecamatan: form.kecamatan || "",
+          address: form.address || "",
+          weight_kg: String(cartWeight || 1),
+        });
         const { data } = await axios.get(`${API}/shipping/rates?${params.toString()}`);
         setShippingRates(data.rates || []);
         if (data.rates?.length && !shippingCourier) {
-          // Default to cheapest courier (sorted asc by cost)
           const cheapest = [...data.rates].sort((a, b) => a.cost - b.cost)[0];
           setShippingCourier(cheapest.courier);
         }
@@ -74,7 +81,7 @@ export default function Checkout() {
     }, 400);
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.city, form.kecamatan]);
+  }, [form.city, form.kecamatan, cartWeight]);
 
   const chosenRate = shippingRates.find((r) => r.courier === shippingCourier);
   const shipping = chosenRate?.cost || 0;
@@ -218,7 +225,14 @@ export default function Checkout() {
               </section>
 
               <section className="glass-card rounded-2xl p-6" data-testid="shipping-section">
-                <h2 className="font-display text-2xl mb-2">Pilih Kurir Pengiriman</h2>
+                <div className="flex items-baseline justify-between gap-4 mb-2">
+                  <h2 className="font-display text-2xl">Pilih Kurir Pengiriman</h2>
+                  {cartWeight > 0 && (
+                    <span className="text-xs opacity-60" data-testid="cart-weight-label">
+                      Berat paket: {cartWeight.toFixed(1)} kg
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm opacity-70 mb-4">
                   Tarif ongkir disesuaikan dengan kota & kecamatan kamu. Pilih salah satu kurir di bawah.
                 </p>

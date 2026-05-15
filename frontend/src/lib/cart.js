@@ -43,6 +43,7 @@ export const useCart = () => {
         name: product.name,
         price: product.price,
         image: product.image,
+        weight_kg: product.weight_kg || 1,
         quantity: qty,
       });
     }

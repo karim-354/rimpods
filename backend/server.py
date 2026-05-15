@@ -41,6 +41,7 @@ PRODUCTS = [
         "tagline": "Nutrisi hidup untuk tank yang ingin lebih dari sekadar jernih.",
         "price": 129999,
         "compare_price": 159000,
+        "weight_kg": 3.0,
         "rating": 4.9,
         "reviews": 891,
         "sold": "1rb+",
@@ -71,6 +72,7 @@ PRODUCTS = [
         "tagline": "Ritual feeding yang tenang untuk reefer yang menjaga konsistensi.",
         "price": 99999,
         "compare_price": 129999,
+        "weight_kg": 2.0,
         "rating": 4.9,
         "reviews": 2198,
         "sold": "3rb+",
@@ -101,6 +103,7 @@ PRODUCTS = [
         "tagline": "Langkah tenang saat parameter air mulai bergeser.",
         "price": 199000,
         "compare_price": 229000,
+        "weight_kg": 0.7,
         "rating": 5.0,
         "reviews": 7,
         "sold": "23+",
@@ -163,6 +166,7 @@ class Order(BaseModel):
     shipping_courier: Optional[str] = None
     shipping_service: Optional[str] = None
     shipping_etd: Optional[str] = None
+    shipping_weight_kg: Optional[float] = None
     discount: int = 0
     voucher_code: Optional[str] = None
     total: int
@@ -289,14 +293,24 @@ async def create_order(payload: OrderCreate, background: BackgroundTasks):
             "is_bundle": is_bundle,
         })
 
-    # Resolve shipping rate based on courier choice + destination
+    # Resolve shipping rate based on courier choice + destination + cart weight
     contact_dict = payload.contact.model_dump()
+    # Compute total cart weight (kg) — base products only; bundle items inherit weight
+    cart_weight = 0.0
+    for it in detailed_items:
+        base_id = it["product_id"].replace(BUNDLE_SUFFIX, "")
+        prod = _find_product(base_id)
+        unit_w = float((prod or {}).get("weight_kg", 1.0))
+        cart_weight += unit_w * int(it["quantity"])
+    cart_weight = max(0.1, cart_weight)
+
     chosen_courier = (payload.shipping_courier or "").strip()
     rate = get_rate_by_choice(
         chosen_courier or "Paxel",
         city=contact_dict.get("city", ""),
         kecamatan=contact_dict.get("kecamatan", "") or "",
         address=contact_dict.get("address", ""),
+        weight_kg=cart_weight,
     )
     shipping = int(rate.get("cost") or 0)
     shipping_courier = rate.get("courier")
@@ -336,6 +350,7 @@ async def create_order(payload: OrderCreate, background: BackgroundTasks):
         shipping_courier=shipping_courier,
         shipping_service=shipping_service,
         shipping_etd=shipping_etd,
+        shipping_weight_kg=round(cart_weight, 2),
         discount=discount,
         voucher_code=voucher_code,
         total=total,
