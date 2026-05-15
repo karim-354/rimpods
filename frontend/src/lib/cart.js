@@ -67,8 +67,9 @@ export const useCart = () => {
 
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const count = items.reduce((s, i) => s + i.quantity, 0);
-  const shipping = subtotal === 0 ? 0 : subtotal >= 250000 ? 0 : 18000;
-  const total = subtotal + shipping;
+  // Shipping is decided at checkout once city + courier selected. Cart shows subtotal only.
+  const shipping = 0;
+  const total = subtotal;
 
   return { items, add, remove, setQty, clear, subtotal, shipping, total, count };
 };

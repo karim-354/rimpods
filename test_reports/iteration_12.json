@@ -1,0 +1,42 @@
+{
+  "summary": "Iteration 12 testing: Midtrans production keys + 3-courier paid shipping (Paxel/JNT/Tiki) + Landing hero/cerita image swap + cart drawer copy refresh. Backend 12/12 pytest passed (100%). Frontend 9/10 UI checks passed; 1 minor test-only mismatch on toast detection (native HTML5 'required' on kecamatan intercepts submit before JS toast fires — UX still blocks submit correctly).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v12_shipping_midtrans.py",
+    "/app/test_reports/pytest/iter12_results.xml"
+  ],
+  "action_items": [
+    "OPTIONAL: kecamatan field has HTML5 `required` attribute on the <Input> which causes the browser-native validation tooltip to appear before the JS `toast.error('...kecamatan')` can fire. Spec said toast must mention 'kecamatan'. Current behaviour: native tooltip says 'Please fill out this field' on the kecamatan input (functionally still blocks submit). If a sonner toast literally mentioning 'kecamatan' is required, remove the `required` HTML attribute from the kecamatan <Input> (and possibly other required inputs) and rely on the JS guard at line 98-101 of Checkout.jsx. Low priority — current UX is arguably better."
+  ],
+  "critical_code_review_comments": [
+    "shipping.py: clean separation of ZONE_KEYWORDS / RATES / resolve_zone / get_rate_by_choice — well-structured and easy to maintain.",
+    "server.py create_order: defensive default to 'Paxel' when shipping_courier missing — confirmed working.",
+    "WhatsApp URL builder includes courier line only when shipping > 0 and courier set — verified.",
+    "cart.js: shipping hardcoded to 0 and total === subtotal — matches iter12 spec (shipping decided at checkout).",
+    "Checkout.jsx debounced 400ms fetch on city/kecamatan change with proper cleanup — good.",
+    "Default courier auto-selects cheapest via sort — verified (JNT 15000 for Jakarta).",
+    "Minor: HTML5 `required` on kecamatan <Input> shadows the JS toast.error guard for missing-field flow. Either remove required attr to allow toast, or accept native browser validation as the UX (currently the case).",
+    "Production Midtrans keys are LIVE — any real call to /api/payment/midtrans/snap-token from a real cart will hit Midtrans production. Confirm rate-limits and that test orders aren't accidentally charged."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_v12_shipping_midtrans.py (new)"
+  ],
+  "success_rate": {
+    "backend": "100% (12/12)",
+    "frontend": "90% (9/10 — toast text scrape mismatch, see action items)"
+  },
+  "test_credentials": "Admin via mongosh seed token (see /app/memory/test_credentials.md). Not exercised this iteration since admin endpoints already regression-tested in iter 11.",
+  "seed_data_creation": "12 TEST_ orders created with notes='TEST_ITER12' across Jakarta/Surabaya — cleanup via mongosh filter on contact.notes",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter 12 added /api/shipping/rates endpoint and shipping_courier field on /api/orders. Zone keyword matching is substring/case-insensitive on city+kecamatan+address. Default zone=3 when no match. RATES dict in /app/backend/shipping.py is source of truth. Midtrans keys are PRODUCTION (IS_PRODUCTION=true) — be careful with snap-token tests against real orders. Cart shipping=0 always (calculated at checkout). Frontend Checkout debounces rates fetch by 400ms after city/kecamatan input. Cheapest courier auto-selected (verified JNT for Jakarta zone 1).",
+  "rca_of_the_issue": "No critical issue. Minor test-side: kecamatan toast was not scrape-detectable because <Input required> triggers native HTML5 validation tooltip before submit handler runs. Verified by reading code: line 99 in Checkout.jsx has 'Mohon lengkapi nama, nomor, alamat, kota, dan kecamatan.' but it never fires when any of those inputs has the `required` attribute. Mitigation: remove required attribute (small UI change) OR rely on native browser tooltip (current behaviour). Submit is still blocked correctly either way."
+}

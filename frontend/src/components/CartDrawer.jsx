@@ -77,7 +77,7 @@ export default function CartDrawer({ open, onOpenChange }) {
 
             <div className="pt-4 border-t border-[hsla(174,70%,55%,0.15)] space-y-2 text-sm">
               <div className="flex justify-between"><span className="opacity-70">Subtotal</span><span data-testid="cart-subtotal">{formatRupiah(subtotal)}</span></div>
-              <div className="flex justify-between"><span className="opacity-70">Pengiriman (estimasi)</span><span>{shipping === 0 ? "Gratis" : formatRupiah(shipping)}</span></div>
+              <div className="flex justify-between"><span className="opacity-70">Pengiriman</span><span className="opacity-60 italic">Pilih kurir di checkout</span></div>
               <div className="flex justify-between text-base pt-1">
                 <span className="font-semibold">Total</span>
                 <span data-testid="cart-total" className="font-display text-xl text-[hsl(var(--reef-glow))]">{formatRupiah(total)}</span>
@@ -92,7 +92,7 @@ export default function CartDrawer({ open, onOpenChange }) {
               Lanjutkan ke Checkout <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
             <p className="text-[11px] text-center opacity-60">
-              Belanja mulai Rp250.000, pengiriman Jabodetabek gratis ongkir.
+              Pilih kurir & cek ongkir di halaman checkout.
             </p>
           </div>
         )}

@@ -19,7 +19,7 @@ const MIN_VOUCHER_SUBTOTAL = 100000;
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const { items, subtotal, shipping, total: baseTotal, clear } = useCart();
+  const { items, subtotal, clear } = useCart();
   const [submitting, setSubmitting] = useState(false);
   const [voucher, setVoucher] = useState(getVoucher());
   const [form, setForm] = useState({
@@ -28,9 +28,13 @@ export default function Checkout() {
     email: "",
     address: "",
     city: "",
+    kecamatan: "",
     notes: "",
   });
   const [channel, setChannel] = useState("midtrans");
+  const [shippingRates, setShippingRates] = useState([]);
+  const [shippingCourier, setShippingCourier] = useState("");
+  const [shippingLoading, setShippingLoading] = useState(false);
 
   useEffect(() => {
     const sync = () => setVoucher(getVoucher());
@@ -42,9 +46,41 @@ export default function Checkout() {
     };
   }, []);
 
+  // Fetch shipping rates whenever city changes (debounced)
+  useEffect(() => {
+    const c = (form.city || "").trim();
+    if (c.length < 3) {
+      setShippingRates([]);
+      setShippingCourier("");
+      return;
+    }
+    const t = setTimeout(async () => {
+      setShippingLoading(true);
+      try {
+        const params = new URLSearchParams({ city: c, kecamatan: form.kecamatan || "", address: form.address || "" });
+        const { data } = await axios.get(`${API}/shipping/rates?${params.toString()}`);
+        setShippingRates(data.rates || []);
+        if (data.rates?.length && !shippingCourier) {
+          // Default to cheapest courier (sorted asc by cost)
+          const cheapest = [...data.rates].sort((a, b) => a.cost - b.cost)[0];
+          setShippingCourier(cheapest.courier);
+        }
+      } catch (err) {
+        console.error("shipping rates error", err);
+        setShippingRates([]);
+      } finally {
+        setShippingLoading(false);
+      }
+    }, 400);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.city, form.kecamatan]);
+
+  const chosenRate = shippingRates.find((r) => r.courier === shippingCourier);
+  const shipping = chosenRate?.cost || 0;
   const voucherEligible = !!voucher && subtotal >= MIN_VOUCHER_SUBTOTAL;
   const discount = voucherEligible ? Math.min(VOUCHER_VALUE, subtotal) : 0;
-  const total = Math.max(0, baseTotal - discount);
+  const total = Math.max(0, subtotal - discount + shipping);
 
   useEffect(() => {
     if (items.length > 0) trackInitiateCheckout(items, total);
@@ -59,8 +95,12 @@ export default function Checkout() {
       toast.error("Keranjang kamu masih kosong.");
       return;
     }
-    if (!form.name || !form.phone || !form.address || !form.city) {
-      toast.error("Mohon lengkapi nama, nomor, alamat, dan kota terlebih dahulu.");
+    if (!form.name || !form.phone || !form.address || !form.city || !form.kecamatan) {
+      toast.error("Mohon lengkapi nama, nomor, alamat, kota, dan kecamatan.");
+      return;
+    }
+    if (!shippingCourier) {
+      toast.error("Silakan pilih kurir pengiriman terlebih dahulu.");
       return;
     }
     setSubmitting(true);
@@ -70,6 +110,7 @@ export default function Checkout() {
         contact: form,
         payment_channel: channel,
         voucher_code: voucherEligible ? voucher : null,
+        shipping_courier: shippingCourier,
       };
       const { data } = await axios.post(`${API}/orders`, payload);
       const orderInfo = {
@@ -160,9 +201,12 @@ export default function Checkout() {
                   <Field label="Kota" testid="input-city">
                     <Input data-testid="input-city" required value={form.city} onChange={setF("city")} placeholder="Jakarta / Surabaya / ..." className="bg-[hsla(192,55%,22%,0.4)] border-[hsla(174,70%,55%,0.25)]" />
                   </Field>
+                  <Field label="Kecamatan" testid="input-kecamatan">
+                    <Input data-testid="input-kecamatan" required value={form.kecamatan} onChange={setF("kecamatan")} placeholder="Setiabudi / Tegalsari / ..." className="bg-[hsla(192,55%,22%,0.4)] border-[hsla(174,70%,55%,0.25)]" />
+                  </Field>
                   <div className="sm:col-span-2">
                     <Field label="Alamat Lengkap" testid="input-address">
-                      <Textarea data-testid="input-address" required value={form.address} onChange={setF("address")} placeholder="Jl. ..., RT/RW, Kelurahan, Kecamatan, Kode Pos" rows={3} className="bg-[hsla(192,55%,22%,0.4)] border-[hsla(174,70%,55%,0.25)]" />
+                      <Textarea data-testid="input-address" required value={form.address} onChange={setF("address")} placeholder="Jl. ..., RT/RW, Kelurahan, Kode Pos" rows={3} className="bg-[hsla(192,55%,22%,0.4)] border-[hsla(174,70%,55%,0.25)]" />
                     </Field>
                   </div>
                   <div className="sm:col-span-2">
@@ -171,6 +215,48 @@ export default function Checkout() {
                     </Field>
                   </div>
                 </div>
+              </section>
+
+              <section className="glass-card rounded-2xl p-6" data-testid="shipping-section">
+                <h2 className="font-display text-2xl mb-2">Pilih Kurir Pengiriman</h2>
+                <p className="text-sm opacity-70 mb-4">
+                  Tarif ongkir disesuaikan dengan kota & kecamatan kamu. Pilih salah satu kurir di bawah.
+                </p>
+                {(!form.city || form.city.trim().length < 3) ? (
+                  <div className="text-sm opacity-60 p-3 bg-[hsla(192,55%,22%,0.4)] rounded-lg border border-[hsla(174,70%,55%,0.15)]" data-testid="shipping-empty">
+                    Mohon isi <b>Kota</b> dulu untuk melihat opsi kurir.
+                  </div>
+                ) : shippingLoading ? (
+                  <div className="text-sm opacity-60 p-3" data-testid="shipping-loading">Menghitung ongkir…</div>
+                ) : shippingRates.length === 0 ? (
+                  <div className="text-sm text-[hsl(var(--reef-coral))] p-3">Tidak ada kurir tersedia untuk kota ini. Mohon hubungi admin via WhatsApp.</div>
+                ) : (
+                  <RadioGroup value={shippingCourier} onValueChange={setShippingCourier} className="space-y-3" data-testid="shipping-courier-group">
+                    {shippingRates.map((r) => (
+                      <label
+                        key={r.courier}
+                        htmlFor={`courier-${r.courier}`}
+                        data-testid={`shipping-courier-${r.courier.toLowerCase()}`}
+                        className={`flex items-center gap-4 cursor-pointer border rounded-xl p-4 transition ${
+                          shippingCourier === r.courier
+                            ? "border-[hsl(var(--reef-glow))] bg-[hsla(49,212,196,0.06)]"
+                            : "border-[hsla(174,70%,55%,0.2)] hover:border-[hsla(174,70%,55%,0.4)]"
+                        }`}
+                      >
+                        <RadioGroupItem id={`courier-${r.courier}`} value={r.courier} className="border-[hsla(174,70%,55%,0.5)]" />
+                        <div className="flex-1 flex items-center justify-between gap-3">
+                          <div>
+                            <div className="font-display text-lg">{r.courier} <span className="text-xs opacity-60 font-sans font-normal">· {r.service}</span></div>
+                            <div className="text-xs opacity-70 mt-0.5">Estimasi: {r.etd}</div>
+                          </div>
+                          <div className="text-right font-semibold text-[hsl(var(--reef-glow))]">
+                            {formatRupiah(r.cost)}
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </RadioGroup>
+                )}
               </section>
 
               <section className="glass-card rounded-2xl p-6">
@@ -200,7 +286,10 @@ export default function Checkout() {
                 </ul>
                 <div className="mt-4 pt-4 border-t border-[hsla(174,70%,55%,0.15)] space-y-2 text-sm">
                   <Row k="Subtotal" v={formatRupiah(subtotal)} />
-                  <Row k="Pengiriman" v={shipping === 0 ? "Gratis" : formatRupiah(shipping)} />
+                  <Row
+                    k={chosenRate ? `Pengiriman (${chosenRate.courier} ${chosenRate.service})` : "Pengiriman"}
+                    v={chosenRate ? formatRupiah(shipping) : "Pilih kurir dulu"}
+                  />
                   {voucher && (
                     <div className={`flex items-start gap-2 text-xs p-2.5 rounded-lg ${voucherEligible ? "bg-[hsla(174,70%,55%,0.1)] border border-[hsla(174,70%,55%,0.25)]" : "bg-[hsla(8,89%,64%,0.1)] border border-[hsla(8,89%,64%,0.25)]"}`} data-testid="voucher-banner">
                       <Gift className={`w-4 h-4 mt-0.5 flex-shrink-0 ${voucherEligible ? "text-[hsl(var(--reef-glow))]" : "text-[hsl(var(--reef-coral))]"}`} />

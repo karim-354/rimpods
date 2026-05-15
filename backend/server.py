@@ -15,6 +15,7 @@ from fingerprint_check import check as fp_check, verify_before_publish
 from auth import build_auth_router
 from admin import build_admin_router
 from payment import build_payment_router
+from shipping import build_shipping_router, get_rate_by_choice
 import email_service
 
 ROOT_DIR = Path(__file__).parent
@@ -134,6 +135,7 @@ class ContactInfo(BaseModel):
     email: Optional[str] = None
     address: str
     city: str
+    kecamatan: Optional[str] = ""
     notes: Optional[str] = ""
 
 
@@ -147,6 +149,7 @@ class OrderCreate(BaseModel):
     contact: ContactInfo
     payment_channel: str = "whatsapp"  # 'whatsapp' or 'tokopedia'
     voucher_code: Optional[str] = None
+    shipping_courier: Optional[str] = None  # 'Paxel' | 'JNT' | 'Tiki'
 
 
 class Order(BaseModel):
@@ -157,6 +160,9 @@ class Order(BaseModel):
     contact: dict
     subtotal: int
     shipping: int
+    shipping_courier: Optional[str] = None
+    shipping_service: Optional[str] = None
+    shipping_etd: Optional[str] = None
     discount: int = 0
     voucher_code: Optional[str] = None
     total: int
@@ -209,7 +215,10 @@ def _resolve_cart_item(pid: str):
 
 
 def _build_whatsapp_url(order_number: str, items: list, contact: dict, total: int,
-                        discount: int = 0, voucher_code: Optional[str] = None) -> str:
+                        discount: int = 0, voucher_code: Optional[str] = None,
+                        shipping_courier: Optional[str] = None,
+                        shipping_service: Optional[str] = None,
+                        shipping: int = 0) -> str:
     lines = [
         "Halo Tim Rimpods, saya ingin melanjutkan pemesanan berikut:",
         f"No. Order: *{order_number}*",
@@ -220,13 +229,16 @@ def _build_whatsapp_url(order_number: str, items: list, contact: dict, total: in
         lines.append(f"- {it['name']} x{it['quantity']} = Rp{it['line_total']:,}".replace(",", "."))
     if discount > 0 and voucher_code:
         lines.append(f"- Voucher {voucher_code} = -Rp{discount:,}".replace(",", "."))
+    if shipping_courier and shipping > 0:
+        svc = f" {shipping_service}" if shipping_service else ""
+        lines.append(f"- Pengiriman {shipping_courier}{svc} = Rp{shipping:,}".replace(",", "."))
     lines += [
         "",
         f"*Total:* Rp{total:,}".replace(",", "."),
         "",
         "*Alamat Pengiriman:*",
         f"{contact['name']} ({contact['phone']})",
-        f"{contact['address']}, {contact['city']}",
+        f"{contact['address']}, {(contact.get('kecamatan') or '').strip()}, {contact['city']}".replace(", ,", ",").strip(),
     ]
     if contact.get("notes"):
         lines += ["", f"Catatan tambahan: {contact['notes']}"]
@@ -277,7 +289,19 @@ async def create_order(payload: OrderCreate, background: BackgroundTasks):
             "is_bundle": is_bundle,
         })
 
-    shipping = 0 if subtotal >= 250000 else 18000
+    # Resolve shipping rate based on courier choice + destination
+    contact_dict = payload.contact.model_dump()
+    chosen_courier = (payload.shipping_courier or "").strip()
+    rate = get_rate_by_choice(
+        chosen_courier or "Paxel",
+        city=contact_dict.get("city", ""),
+        kecamatan=contact_dict.get("kecamatan", "") or "",
+        address=contact_dict.get("address", ""),
+    )
+    shipping = int(rate.get("cost") or 0)
+    shipping_courier = rate.get("courier")
+    shipping_service = rate.get("service")
+    shipping_etd = rate.get("etd")
 
     # Apply voucher discount (never below 0, and never discounts shipping)
     discount = 0
@@ -294,10 +318,12 @@ async def create_order(payload: OrderCreate, background: BackgroundTasks):
     total = subtotal - discount + shipping
 
     order_number = "RMP" + datetime.now(timezone.utc).strftime("%y%m%d") + uuid.uuid4().hex[:5].upper()
-    contact_dict = payload.contact.model_dump()
 
     wa_url = _build_whatsapp_url(order_number, detailed_items, contact_dict, total,
-                                 discount=discount, voucher_code=voucher_code)
+                                 discount=discount, voucher_code=voucher_code,
+                                 shipping_courier=shipping_courier,
+                                 shipping_service=shipping_service,
+                                 shipping=shipping)
     # First product Tokopedia link as primary fallback
     toko_url = detailed_items[0]["tokopedia_url"] if detailed_items else TOKO_BASE
 
@@ -307,6 +333,9 @@ async def create_order(payload: OrderCreate, background: BackgroundTasks):
         contact=contact_dict,
         subtotal=subtotal,
         shipping=shipping,
+        shipping_courier=shipping_courier,
+        shipping_service=shipping_service,
+        shipping_etd=shipping_etd,
         discount=discount,
         voucher_code=voucher_code,
         total=total,
@@ -354,6 +383,7 @@ _auth_router, _current_user, _require_admin = build_auth_router(db)
 app.include_router(_auth_router)
 app.include_router(build_admin_router(db, _require_admin))
 app.include_router(build_payment_router(db))
+app.include_router(build_shipping_router())
 
 _cors_raw = os.environ.get("CORS_ORIGINS", "*")
 _cors_list = [o.strip() for o in _cors_raw.split(",") if o.strip()]

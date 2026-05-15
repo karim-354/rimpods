@@ -136,7 +136,7 @@ export default function Landing() {
           <div className="lg:col-span-5 relative rise-in">
             <div className="glass-card glow-ring rounded-[2rem] p-3 rotate-1">
               <img
-                src="https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=1100&q=85"
+                src="https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/mfgdi1z2_Instagram%20Carousel%20Perang%20Bakteri%20Koral%202026.png"
                 alt="Reef tank coral mekar"
                 className="rounded-[1.6rem] w-full h-[420px] lg:h-[520px] object-cover"
               />
@@ -270,7 +270,7 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto px-5 lg:px-10 grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1545671913-b89ac1b4ac10?w=1000&q=85"
+              src="https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/wmdlkyuf_Dramatic%205-Photo%20Visual%20Collage.png"
               alt="Coral close up"
               className="rounded-[1.8rem] w-full h-[460px] object-cover glow-ring"
             />
