@@ -81,29 +81,21 @@ export default function Landing() {
           <div className="lg:col-span-7 rise-in">
             <Badge data-testid="hero-badge" className="bg-[hsla(174,70%,55%,0.15)] text-[hsl(var(--reef-glow))] border border-[hsla(174,70%,55%,0.35)] rounded-full px-4 py-1 mb-6">
               <Sparkles className="w-3.5 h-3.5 mr-2" />
-              Pakan coral hidup — dikultur di Bekasi, dipersembahkan untuk reefer di seluruh Indonesia
+              Pakan coral hidup — kultur langsung di Jakarta, hadir untuk reefer di seluruh Indonesia
             </Badge>
             <h1 data-testid="hero-title" className="font-display text-5xl sm:text-6xl lg:text-7xl leading-[1.02] tracking-tight">
-              Tank yang <span className="text-[hsl(var(--reef-coral))]">hidup</span>, bukan sekadar indah.
+              Gonio Sultan <span className="text-[hsl(var(--reef-coral))]">Numpang Mati?</span><br />Selamatkan dengan Pakan 50 Mikron.
             </h1>
             <p className="mt-6 text-lg max-w-xl text-[hsl(var(--reef-foam))]/80 leading-relaxed">
-              Live rotifer, phytoplankton segar, dan formula pendamping pemulihan air — kami rawat dengan standar yang kami jaga sendiri. Untuk kamu yang memperhatikan detail, coral kamu akan bicara.
+              Pelet biasa terlalu besar, membusuk dan bikin air spike. Rimpods memberikan zooplankton hidup instingtif yang langsung disambar koral.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button
                 data-testid="hero-shop-btn"
-                onClick={() => document.getElementById("produk")?.scrollIntoView({ behavior: "smooth" })}
+                onClick={() => window.location.href = '/checkouts'}
                 className="coral-pill hover:opacity-90 h-12 px-7 rounded-full font-semibold"
               >
-                Jelajahi Produk <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-              <Button
-                data-testid="hero-story-btn"
-                onClick={() => document.getElementById("cerita")?.scrollIntoView({ behavior: "smooth" })}
-                variant="outline"
-                className="bg-transparent border-[hsla(174,70%,55%,0.4)] text-[hsl(var(--reef-foam))] hover:bg-[hsla(174,70%,55%,0.1)] h-12 px-7 rounded-full"
-              >
-                Kenali Rimpods
+                Beli Bundel Gonio <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
 
