@@ -87,7 +87,7 @@ export default function Landing() {
               Gonio Sultan <span className="text-[hsl(var(--reef-coral))]">Numpang Mati?</span><br />Selamatkan dengan Pakan 50 Mikron.
             </h1>
             <p className="mt-6 text-lg max-w-xl text-[hsl(var(--reef-foam))]/80 leading-relaxed">
-              Pelet biasa terlalu besar, membusuk dan bikin air spike. Rimpods memberikan zooplankton hidup instingtif yang langsung disambar koral.
+              Pelet biasa terlalu besar, membusuk dan bikin air spike. Rimpods memberikan zooplankton hidup instingtif yang langsung disambar koral .
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button
