@@ -128,7 +128,7 @@ export default function Landing() {
           <div className="lg:col-span-5 relative rise-in">
             <div className="glass-card glow-ring rounded-[2rem] p-3 rotate-1 bg-[hsla(8,30%,15%,0.4)]">
               <img
-                src="https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/mfgdi1z2_Instagram%20Carousel%20Perang%20Bakteri%20Koral%202026.png"
+                src="/aaaaa.png"
                 alt="Reef tank coral mekar"
                 className="rounded-[1.6rem] w-full h-auto object-contain max-h-[600px]"
               />
