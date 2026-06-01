@@ -4,6 +4,7 @@ import uuid
 import base64
 import httpx
 import pymongo
+from urllib.parse import quote
 from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -52,6 +53,129 @@ app.add_middleware(
 _auth_router, _current_user, _require_admin = build_auth_router(async_db)
 app.include_router(_auth_router)
 app.include_router(build_admin_router(async_db, _require_admin))
+
+# ==========================================
+# PRODUCT CATALOG (source of truth) + idempotent seed
+# ==========================================
+PRODUCTS = [
+    {
+        "id": "rotifer-2l-phyto",
+        "slug": "rotifera-2l-besar",
+        "name": "Rimpods Rotifera 2L + Phytoplankton",
+        "tagline": "Nutrisi hidup untuk tank yang ingin lebih dari sekadar jernih.",
+        "price": 129999,
+        "compare_price": 159000,
+        "weight_kg": 3.0,
+        "rating": 4.9,
+        "reviews": 891,
+        "sold": "1rb+",
+        "stock": 9370,
+        "image": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/kvng7upw_a1.jpeg",
+        "image_alt": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/r5m9fr4a_aa.jpeg",
+        "tokopedia_url": "https://www.tokopedia.com/rimpods/rimpods-rotifera-2liter-besar-dengan-1-phytoplankton-ideal-untuk-coral-mekar-dalam-tank-besar-1731802588285273240",
+        "tiktok_shop_url": "https://shop-id.tokopedia.com/view/product/1731802588285273240?encode_params=MIIBPwQM1nt56rSgUGmzMv8TBIIBGwaUatQ26awirmatcvftdKZiMMCLdfwPP0Vt_jjIWQWI7c_AvEPiFZyNqPCi3Kp1qWOsrDWvt8J_5nsDA5NgnjVFS0AA1-kxfjcCegpoAegD7Afld469BIBHbb7750vkS2xOOpgKRMdr_PVqIMAh4o42h0RZZfXOsqHH_SKAOzSSEMq7oIMlyvvb2HxTPj3GibfGrIZIKDUYgt8o5ZXUXctEIKqGNgNe8uHJ15NVZGRlEE3OhygovK3Q6CbdPb0_FMF-VzwsEE-KYyf1mBVcRllRsYwWFxWi_d5BiAExtoGzo9Y5qiST06mn60ctavRonXxtJq2uBmFmL5r2sJByYXG_h2EeUe3-F7NSVW-yqTRO-rkNK6LY-v7O8aYEEDVEKVjohiI_MkEolKE7WMo%3D",
+        "upsell_target": "tbn-turn-back-nutrients",
+        "highlights": [
+            "Kultur live dari fasilitas Bekasi, dipanen saat kesegarannya paling matang",
+            "Satu paket lengkap: 2 liter rotifer aktif plus 1 botol phytoplankton pendamping",
+            "Selaras untuk SPS, LPS, dan soft coral — satu formula untuk seluruh koloni",
+            "Dikemas dengan metode suhu-terjaga, agar sampai di tangan kamu masih hidup",
+        ],
+        "description": (
+            "Tank dengan kapasitas di atas 400 liter punya ritme yang khas: ruang yang luas, "
+            "arus yang dinamis, dan coral yang ingin merespons lebih ekspresif. Di titik itulah "
+            "rotifer 2 liter ini kami siapkan. Satu kali tuang, kamu akan melihat polip mulai "
+            "mencari, lalu memanjang dengan tenang. Tak perlu dramatisasi — hasilnya akan bicara "
+            "sendiri pada hari kedua dan ketiga."
+        ),
+    },
+    {
+        "id": "paket-hemat-5r-1p",
+        "slug": "paket-hemat-5-rotifer-1-phyto",
+        "name": "Paket Hemat 5 Rotifer + 1 Phytoplankton",
+        "tagline": "Ritual feeding yang tenang untuk reefer yang menjaga konsistensi.",
+        "price": 99999,
+        "compare_price": 129999,
+        "weight_kg": 2.0,
+        "rating": 4.9,
+        "reviews": 2198,
+        "sold": "3rb+",
+        "stock": 98967,
+        "image": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/f12ycsla_WhatsApp%20Image%202026-05-03%20at%208.19.10%20PM%20%283%29.jpeg",
+        "image_alt": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/h18wqlnd_WhatsApp%20Image%202026-05-03%20at%208.19.10%20PM%20%282%29.jpeg",
+        "tokopedia_url": "https://www.tokopedia.com/rimpods/paket-hemat-5-rotifer-1-phytoplankton-rotifera-pakan-coral-food",
+        "tiktok_shop_url": "https://shop-id.tokopedia.com/view/product/1729681104107505816?encode_params=MIIBPwQMtSyEzExlVv5-1n7BBIIBGzAUXHLTRG_vnYZLWo-tdTZh8mOnGI_-yYjw1_2fax1aV-gtHdLeOf0irSqA63YYRxYQQbDw5eopIeUY6po_T9YkMa56OOf4cNEiNROicGUyl3gwyM__DWLoh5hvNDpKWonYk6pTm4WNjPuhK5faLARdq6CrTuEDwee6GpePdtfVceNxZgtRfoDYwsA-ItNzSxUsFoT15Ma_ksplFTLK9VCxh8qqdNjwcEXeRUrzcszutaH7KAoXHrdkoIO9D3J95TZOKL1-QWGpEvEu7byRBV78nHlnsvHlJ-iJt7ZbMWPtf1VPjTjcjEC4LCBGiflcA_tb6_1vBkKPI-rDVZr_raWuOo3M4LRKCiFLTh-xs3YD9JOTtLBw7JnkriUEEJDrsMWZg6SUSTpWc4iyZM0%3D",
+        "upsell_target": "tbn-turn-back-nutrients",
+        "highlights": [
+            "4 botol Rotifer + 1 botol Phytoplankton, plus 1 botol Rotifer BONUS — total 5R + 1P",
+            "Stok yang cukup untuk satu siklus feeding yang rapi",
+            "Simpan di kulkas, tuang sesuai jadwal, biarkan coral menemukan ritmenya",
+            "Pilihan favorit reefer yang menjaga display tank mereka setiap pekan",
+        ],
+        "description": (
+            "Kalau kamu sudah menemukan ritme feeding yang cocok untuk tank kamu, paket ini "
+            "dirancang untuk menjaga ritme itu tetap ringan. Lima botol rotifer (4 botol + "
+            "1 botol bonus) dan satu phytoplankton datang dalam satu kiriman yang rapi — siap "
+            "menemani rutinitas dosing kamu selama beberapa minggu ke depan. Tidak ada yang "
+            "terburu-buru, tidak ada yang terlewat. Hanya konsistensi yang tenang."
+        ),
+    },
+    {
+        "id": "tbn-turn-back-nutrients",
+        "slug": "turn-back-nutrients",
+        "name": "Rimpods Turn Back Nutrients (TBN)",
+        "tagline": "Langkah tenang saat parameter air mulai bergeser.",
+        "price": 199000,
+        "compare_price": 229000,
+        "weight_kg": 0.7,
+        "rating": 5.0,
+        "reviews": 7,
+        "sold": "23+",
+        "stock": 2,
+        "image": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/quds6vg4_WhatsApp%20Image%202026-05-03%20at%208.19.10%20PM%20%281%29.jpeg",
+        "image_alt": "https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/y598w8ty_WhatsApp%20Image%202026-05-03%20at%208.19.08%20PM.jpeg",
+        "tokopedia_url": "https://www.tokopedia.com/rimpods/rimpods-turn-back-nutrients-1729680758563637400",
+        "tiktok_shop_url": "https://shop-id.tokopedia.com/view/product/1729680758563637400?encode_params=MIIBPwQMqbROjEM3BPHLuhnJBIIBG3uhbqbT5XCAw9NxrkY0TOfMuwVzgf7nroyqHalMgEFU-CepQc9GPBqvGT78nKS8rOav9rZzPpIwssJ0fYfP7nP7EWo3reZC8937ufvMyKXI9EldDd49nCsU5vjwzZ3nkfK-73vvQwAUi9QrUyp_7a33mERjsrknUxB1JS4EjxZo1UqIkmEeDjScWnWoQWNeIXAwXJDmtTLlf4N9j00N6f8PkhpJf8Jq4VV-u4vDv-t2tw2JP6csNUqYPisDbCbV13ZMZIDf6jynixQx7Odfms4rP57kFPjI42XyRHOV-e4G9zwIjJ0tgg2g3zBLzjUreCocHd0btJA6W96LhXy2uQREGzmwgzqd0Y4_1heOM-_374hBZEWrXS9mOYIEEBteNEV4QU9WvizaAjm5-KI%3D",
+        "upsell_target": "rotifer-2l-phyto",
+        "highlights": [
+            "Diformulasikan untuk mendampingi stabilisasi air pasca perubahan signifikan",
+            "Bekerja berdampingan dengan filtrasi dan water change — bukan pengganti",
+            "Aman untuk koloni coral sensitif, ikan, dan invertebrata",
+            "Stok kami jaga terbatas, supaya setiap botol selalu dalam batch terbaru",
+        ],
+        "description": (
+            "Ada momen ketika tank yang tenang tiba-tiba berubah ritmenya — air sedikit "
+            "keruh, parameter bergeser, polip mulai menutup. Pada momen itu, kamu butuh "
+            "langkah yang terukur, bukan panik. TBN hadir untuk membantu kamu mengembalikan "
+            "fase fresh secara bertahap: cek parameter, perbaiki filtrasi, lakukan water "
+            "change 20–50 persen, ganti media, lalu tuang TBN. Setelah itu, pantau kualitas "
+            "air secara rutin — dan biarkan tank kamu kembali menemukan ketenangannya."
+        ),
+    },
+]
+
+def _seed_products():
+    """Idempotent upsert of catalog into db.products (used by order price validation)."""
+    try:
+        for _p in PRODUCTS:
+            db.products.update_one({"_id": _p["id"]}, {"$set": _p}, upsert=True)
+    except Exception as e:
+        print(f"[seed_products] warning: {e}")
+
+_seed_products()
+
+
+@app.get("/api/products")
+async def list_products():
+    return {"products": PRODUCTS}
+
+
+@app.get("/api/products/{product_id}")
+async def get_product(product_id: str):
+    for p in PRODUCTS:
+        if p["id"] == product_id or p.get("slug") == product_id:
+            return p
+    raise HTTPException(status_code=404, detail="Produk tidak ditemukan")
 
 def clean_phone_number(phone: str) -> str:
     cleaned = re.sub(r'\D', '', phone)
@@ -281,7 +405,7 @@ async def create_order(req: OrderRequest):
         f"{req.contact.address}, {req.contact.kecamatan}, {req.contact.city}"
     ).replace(",", ".")
     
-    whatsapp_url = f"https://wa.me/{WA_ADMIN_NUMBER}?text={httpx.URL(wa_text)}"
+    whatsapp_url = f"https://wa.me/{WA_ADMIN_NUMBER}?text={quote(wa_text)}"
 
     return {
         "id": order_id,
