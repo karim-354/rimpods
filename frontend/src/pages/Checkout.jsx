@@ -11,8 +11,7 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { ChevronLeft, ShoppingBag, CreditCard, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
-// TARGET PRODUKSI MUTLAK
-const API = "https://rimpods.com/api";
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Checkout() {
   const navigate = useNavigate();
