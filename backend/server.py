@@ -10,6 +10,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
+from motor.motor_asyncio import AsyncIOMotorClient
+from auth import build_auth_router
+from admin import build_admin_router
 
 load_dotenv()
 app = FastAPI(title="Rimpods Monolith Production API")
@@ -20,6 +23,8 @@ app = FastAPI(title="Rimpods Monolith Production API")
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 DB_NAME = os.getenv("DB_NAME", "test_database")
 db = pymongo.MongoClient(MONGO_URL)[DB_NAME]
+# Async client (motor) used only by the modular auth + admin routers
+async_db = AsyncIOMotorClient(MONGO_URL)[DB_NAME]
 
 BITESHIP_KEY = os.getenv("BITESHIP_KEY")
 BITESHIP_API = "https://api.biteship.com/v1"
@@ -40,6 +45,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ==========================================
+# MODULAR ROUTERS: AUTH (Google) + ADMIN (order monitoring)
+# ==========================================
+_auth_router, _current_user, _require_admin = build_auth_router(async_db)
+app.include_router(_auth_router)
+app.include_router(build_admin_router(async_db, _require_admin))
 
 def clean_phone_number(phone: str) -> str:
     cleaned = re.sub(r'\D', '', phone)
