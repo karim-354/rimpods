@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { trackAddToCart } from "../lib/tracker";
 import UpsellModal from "../components/UpsellModal";
 import ExitIntentModal from "../components/ExitIntentModal";
+import { getReturningCustomer, firstName } from "../lib/customer";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -46,7 +47,12 @@ export default function Landing() {
   const [products, setProducts] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [upsellTarget, setUpsellTarget] = useState(null);
+  const [returningCustomer, setReturningCustomer] = useState(null);
   const { add } = useCart();
+
+  useEffect(() => {
+    setReturningCustomer(getReturningCustomer());
+  }, []);
 
   useEffect(() => {
     axios.get(`${API}/products`).then((r) => setProducts(r.data.products || [])).catch(() => {
@@ -79,6 +85,24 @@ export default function Landing() {
         <div className="caustics absolute inset-0" />
         <div className="relative max-w-7xl mx-auto px-5 lg:px-10 pt-16 pb-24 lg:pt-28 lg:pb-32 grid lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7 rise-in">
+            {returningCustomer && (returningCustomer.name || returningCustomer.phone) && (
+              <div
+                data-testid="returning-greeting"
+                className="mb-5 flex items-center gap-3 rounded-2xl border border-[hsla(174,70%,55%,0.35)] bg-[hsla(174,70%,55%,0.10)] px-5 py-3 backdrop-blur-sm max-w-xl"
+              >
+                <span className="text-2xl shrink-0" aria-hidden="true">🪸</span>
+                <div className="leading-snug">
+                  <p className="font-display text-base sm:text-lg text-[hsl(var(--reef-glow))]">
+                    {returningCustomer.name
+                      ? `Senang menyambut Anda kembali, Kak ${firstName(returningCustomer.name)} 🙏`
+                      : "Senang menyambut Anda kembali 🙏"}
+                  </p>
+                  <p className="text-sm text-[hsl(var(--reef-foam))]/75">
+                    Terima kasih sudah mempercayai Rimpods lagi. Saat checkout, alamat Anda kami isi otomatis — tinggal pilih ongkir &amp; bayar.
+                  </p>
+                </div>
+              </div>
+            )}
             <Badge data-testid="hero-badge" className="bg-[hsla(174,70%,55%,0.15)] text-[hsl(var(--reef-glow))] border border-[hsla(174,70%,55%,0.35)] rounded-full px-4 py-1 mb-6">
               <Sparkles className="w-3.5 h-3.5 mr-2" />
               Pakan coral hidup — kultur langsung di Jakarta, hadir untuk reefer di seluruh Indonesia

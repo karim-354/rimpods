@@ -10,6 +10,7 @@ import { Textarea } from "../components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { ChevronLeft, ShoppingBag, CreditCard, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
+import { saveReturningCustomer } from "../lib/customer";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -35,6 +36,7 @@ export default function Checkout() {
       const { data } = await axios.get(`${API}/customer/lookup?phone=${form.phone}`);
       if (data.found && data.contact) {
         toast.success("Selamat datang kembali! Alamat kirim otomatis diterapkan.");
+        saveReturningCustomer(data.contact.name, form.phone);
         setForm({
           ...form,
           name: data.contact.name || "",
@@ -124,6 +126,8 @@ export default function Checkout() {
       };
       
       const { data } = await axios.post(`${API}/orders`, payload);
+      // Ingat pelanggan ini untuk sapaan personal di kunjungan berikutnya
+      saveReturningCustomer(form.name, form.phone);
 
       if (channel === "midtrans") {
         if (!window.snap) {
