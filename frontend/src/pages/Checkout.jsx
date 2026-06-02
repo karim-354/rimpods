@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { ChevronLeft, ShoppingBag, CreditCard, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { saveReturningCustomer } from "../lib/customer";
+import LocationPicker from "../components/LocationPicker";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -102,7 +103,7 @@ export default function Checkout() {
       }
     };
     fetchRates();
-  }, [form.postalCode, form.latitude, items]);
+  }, [form.postalCode, form.latitude, form.longitude, items]);
 
   const chosenRate = shippingRates.find((r) => r.id === shippingCourier);
   const shipping = chosenRate?.cost || 0;
@@ -213,6 +214,15 @@ export default function Checkout() {
           <div className="space-y-2">
             <Label>Alamat Lengkap</Label>
             <Textarea required value={form.address} onChange={(e) => setForm({...form, address: e.target.value})} placeholder="Nama jalan, nomor rumah, RT/RW, blok, patokan" className="bg-slate-950 text-white" />
+          </div>
+
+          <div className="space-y-2 pt-2">
+            <Label className="font-bold text-base">Pin Lokasi Pengiriman</Label>
+            <LocationPicker
+              lat={form.latitude}
+              lng={form.longitude}
+              onChange={(la, ln) => setForm((f) => ({ ...f, latitude: la, longitude: ln }))}
+            />
           </div>
 
           <div className="space-y-2 pt-2">
