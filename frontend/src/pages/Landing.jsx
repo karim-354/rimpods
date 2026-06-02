@@ -116,7 +116,7 @@ export default function Landing() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Button
                 data-testid="hero-shop-btn"
-                onClick={() => window.location.href = '/checkouts'}
+                onClick={() => document.getElementById('produk')?.scrollIntoView({ behavior: 'smooth' })}
                 className="coral-pill hover:opacity-90 h-12 px-7 rounded-full font-semibold"
               >
                 Beli Bundel Gonio <ChevronRight className="w-4 h-4 ml-1" />

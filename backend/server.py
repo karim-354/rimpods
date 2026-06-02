@@ -94,7 +94,7 @@ PRODUCTS = [
         "slug": "paket-hemat-5-rotifer-1-phyto",
         "name": "Paket Hemat 5 Rotifer + 1 Phytoplankton",
         "tagline": "Ritual feeding yang tenang untuk reefer yang menjaga konsistensi.",
-        "price": 99999,
+        "price": 89999,
         "compare_price": 129999,
         "weight_kg": 2.0,
         "rating": 4.9,

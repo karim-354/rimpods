@@ -177,16 +177,17 @@ export default function Checkout() {
             
             {areaResults.length > 0 && (
               <ul className="absolute z-50 w-full bg-slate-900 border border-slate-700 max-h-48 overflow-y-auto rounded-lg shadow-xl top-full left-0 mt-1">
-                {areaResults.map((area) => {
+                {areaResults.map((area, idx) => {
                   const nameStr = area.name || "";
-                  const cityStr = area.administrative_division_level_2 || "";
-                  const postStr = area.postal_code || "00000";
+                  const cityStr = area.administrative_division_level_2_name || "";
+                  const _pm = nameStr.match(/(\d{5})(?!.*\d{5})/);
+                  const postStr = _pm ? _pm[1] : "";
                   return (
                     <li 
-                      key={area.id} 
+                      key={`${area.id}-${idx}`} 
                       onMouseDown={(e) => {
                         e.preventDefault();
-                        const mergedText = `${nameStr}, ${cityStr}`;
+                        const mergedText = nameStr;
                         setSelectedKeyword(mergedText);
                         setKeyword(mergedText);
                         setForm({
@@ -194,14 +195,14 @@ export default function Checkout() {
                           kecamatan: nameStr,
                           city: cityStr,
                           postalCode: String(postStr),
-                          latitude: area.latitude ? String(area.latitude) : "",
-                          longitude: area.longitude ? String(area.longitude) : ""
+                          latitude: "",
+                          longitude: ""
                         });
                         setAreaResults([]);
                       }}
                       className="p-3 border-b border-slate-800 hover:bg-slate-800 cursor-pointer text-sm text-slate-200"
                     >
-                      {nameStr}, {cityStr} • <span className="text-blue-400">Pos: {postStr}</span>
+                      {nameStr}{postStr ? "" : " • kode pos tidak terdeteksi"}
                     </li>
                   );
                 })}
