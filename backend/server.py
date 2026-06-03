@@ -535,6 +535,37 @@ async def admin_sync_payment(order_number: str, admin=Depends(_require_admin)):
         "shipping_awb": refreshed.get("shipping_awb"),
     }
 
+@app.post("/api/shipping/biteship/webhook")
+async def biteship_webhook(request: Request):
+    """Terima update status pengiriman dari Biteship (event order.status) dan
+    perbarui status order berdasarkan AWB/Biteship order id. Verifikasi signature
+    bersifat opsional (aktif hanya bila BITESHIP_WEBHOOK_SECRET diset di env)."""
+    expected = os.getenv("BITESHIP_WEBHOOK_SECRET")
+    header_name = os.getenv("BITESHIP_WEBHOOK_HEADER", "X-Biteship-Signature")
+    if expected:
+        if request.headers.get(header_name) != expected:
+            raise HTTPException(status_code=401, detail="Invalid signature")
+
+    try:
+        data = await request.json()
+    except Exception:
+        return {"status": "ignored"}
+
+    biteship_order_id = data.get("order_id") or data.get("id")
+    status = data.get("status") or (data.get("courier") or {}).get("status")
+    waybill = data.get("courier_waybill_id") or data.get("waybill_id")
+
+    if biteship_order_id:
+        update = {"shipping_updated_at": datetime.now(timezone.utc).isoformat()}
+        if status:
+            update["shipping_status"] = status
+        if waybill:
+            update["shipping_waybill"] = waybill
+        db.orders.update_one({"shipping_awb": biteship_order_id}, {"$set": update})
+
+    return {"status": "ok"}
+
+
 async def auto_book_biteship(order):
     raw_courier = order.get("shipping_courier", "jne_reg").split("_")
     c_company = raw_courier[0]
