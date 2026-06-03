@@ -6,7 +6,7 @@ import httpx
 import pymongo
 from urllib.parse import quote
 from datetime import datetime, timezone
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Dict, Any, Optional
@@ -30,6 +30,8 @@ async_db = AsyncIOMotorClient(MONGO_URL)[DB_NAME]
 BITESHIP_KEY = os.getenv("BITESHIP_KEY")
 BITESHIP_API = "https://api.biteship.com/v1"
 MIDTRANS_SERVER_KEY = os.getenv("MIDTRANS_SERVER_KEY")
+MIDTRANS_IS_PRODUCTION = os.getenv("MIDTRANS_IS_PRODUCTION", "true").lower() == "true"
+MIDTRANS_STATUS_BASE = "https://api.midtrans.com" if MIDTRANS_IS_PRODUCTION else "https://api.sandbox.midtrans.com"
 WA_ADMIN_NUMBER = os.getenv("WA_ADMIN_NUMBER", "6282216594354")
 
 ORIGIN_LAT = -6.259636
@@ -476,6 +478,63 @@ async def midtrans_webhook(request: Request):
     )
     return {"status": "ok"}
 
+
+@app.post("/api/admin/orders/{order_number}/sync-payment")
+async def admin_sync_payment(order_number: str, admin=Depends(_require_admin)):
+    """Tanya status pembayaran langsung ke Midtrans. Jika lunas -> set paid + booking Biteship.
+    Jaring pengaman bila webhook Midtrans terlewat."""
+    order = db.orders.find_one({"order_number": order_number})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order tidak ditemukan")
+
+    auth_string = base64.b64encode(f"{MIDTRANS_SERVER_KEY}:".encode()).decode()
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(
+            f"{MIDTRANS_STATUS_BASE}/v2/{order_number}/status",
+            headers={"Authorization": f"Basic {auth_string}", "Accept": "application/json"},
+        )
+    try:
+        pay = resp.json()
+    except Exception:
+        raise HTTPException(status_code=502, detail="Respons Midtrans tidak valid")
+
+    tstatus = pay.get("transaction_status")
+    if not tstatus:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Midtrans: {pay.get('status_message', 'transaksi belum ada / belum dibayar')}",
+        )
+
+    if tstatus in ["settlement", "capture"]:
+        new_status = "paid"
+    elif tstatus in ["deny", "expire", "cancel"]:
+        new_status = "failed"
+    else:
+        new_status = "pending"
+
+    booked = False
+    biteship_error = None
+    if new_status == "paid" and not order.get("shipping_awb"):
+        try:
+            await auto_book_biteship(order)
+            booked = True
+        except Exception as e:
+            biteship_error = str(e)
+
+    db.orders.update_one(
+        {"order_number": order_number},
+        {"$set": {"status": new_status, "updated_at": datetime.now(timezone.utc).isoformat()}},
+    )
+    refreshed = db.orders.find_one({"order_number": order_number}, {"_id": 0}) or {}
+    return {
+        "order_number": order_number,
+        "transaction_status": tstatus,
+        "status": new_status,
+        "biteship_booked": booked,
+        "biteship_error": biteship_error,
+        "shipping_awb": refreshed.get("shipping_awb"),
+    }
+
 async def auto_book_biteship(order):
     raw_courier = order.get("shipping_courier", "jne_reg").split("_")
     c_company = raw_courier[0]
@@ -514,8 +573,10 @@ async def auto_book_biteship(order):
     headers = {"Authorization": f"Bearer {BITESHIP_KEY}", "Content-Type": "application/json"}
     async with httpx.AsyncClient() as client:
         res = await client.post(f"{BITESHIP_API}/orders", json=payload, headers=headers)
-        if res.status_code == 200:
-            db.orders.update_one(
-                {"id": order["id"]},
-                {"$set": {"shipping_awb": res.json().get("id"), "shipping_status": "allocated"}}
-            )
+        if res.status_code != 200:
+            raise Exception(f"Biteship {res.status_code}: {res.text[:250]}")
+        db.orders.update_one(
+            {"id": order["id"]},
+            {"$set": {"shipping_awb": res.json().get("id"), "shipping_status": "allocated"}}
+        )
+        return res.json().get("id")

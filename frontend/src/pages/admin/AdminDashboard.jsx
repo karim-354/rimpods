@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/button";
 import { LogOut, ShieldAlert, TrendingUp, ShoppingBag, Gift, Wallet, RefreshCcw } from "lucide-react";
 import { formatRupiah } from "../../lib/cart";
 import WhatsAppQuickActions from "../../components/admin/WhatsAppQuickActions";
+import { toast } from "sonner";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -81,6 +82,36 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(null);
+
+  const syncPayment = async (orderNumber) => {
+    setSyncing(orderNumber);
+    try {
+      const { data } = await axios.post(
+        `${API}/admin/orders/${orderNumber}/sync-payment`,
+        {},
+        { withCredentials: true }
+      );
+      if (data.status === "paid") {
+        if (data.biteship_booked) {
+          toast.success(`${orderNumber}: LUNAS • Order Biteship dibuat (AWB ${data.shipping_awb || "-"})`);
+        } else if (data.biteship_error) {
+          toast.warning(`${orderNumber}: LUNAS, tapi Biteship gagal: ${data.biteship_error}`);
+        } else if (data.shipping_awb) {
+          toast.success(`${orderNumber}: LUNAS • Biteship sudah ada`);
+        } else {
+          toast.success(`${orderNumber}: LUNAS`);
+        }
+      } else {
+        toast.info(`${orderNumber}: Midtrans = ${data.transaction_status} (status: ${data.status})`);
+      }
+      await loadData();
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Gagal cek status pembayaran");
+    } finally {
+      setSyncing(null);
+    }
+  };
 
   useEffect(() => {
     // If AuthCallback didn't pass a user, verify via /auth/me
@@ -285,9 +316,32 @@ export default function AdminDashboard() {
                           )}
                         </td>
                         <td className="px-4 py-3 text-xs capitalize">{o.payment_channel}</td>
-                        <td className="px-4 py-3 text-xs capitalize">{o.status || "pending"}</td>
+                        <td className="px-4 py-3 text-xs">
+                          <div className={`capitalize font-semibold ${o.status === "paid" ? "text-emerald-400" : o.status === "failed" ? "text-red-400" : "text-amber-400"}`}>
+                            {o.status || "pending"}
+                          </div>
+                          {o.shipping_awb ? (
+                            <div className="text-[10px] text-emerald-400/80">Biteship ✓</div>
+                          ) : (
+                            o.status === "paid" && <div className="text-[10px] text-amber-400/80">Biteship belum</div>
+                          )}
+                        </td>
                         <td className="px-4 py-3">
-                          <WhatsAppQuickActions order={o} />
+                          <div className="flex items-center gap-2">
+                            {o.payment_channel === "midtrans" && o.status !== "paid" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => syncPayment(o.order_number)}
+                                disabled={syncing === o.order_number}
+                                className="bg-transparent border-[hsla(174,70%,55%,0.3)] text-[hsl(var(--reef-foam))] hover:bg-[hsla(174,70%,55%,0.1)] rounded-full text-xs h-8"
+                              >
+                                <RefreshCcw className={`w-3 h-3 mr-1 ${syncing === o.order_number ? "animate-spin" : ""}`} />
+                                Cek Bayar
+                              </Button>
+                            )}
+                            <WhatsAppQuickActions order={o} />
+                          </div>
                         </td>
                       </tr>
                     ))
