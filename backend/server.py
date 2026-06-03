@@ -290,7 +290,7 @@ async def get_rates(req: RatesRequest):
         "origin_latitude": ORIGIN_LAT,
         "origin_longitude": ORIGIN_LON,
         "origin_postal_code": int(ORIGIN_POSTAL),
-        "couriers": "grab,gojek,jne,jnt,sicepat,paxel,lalamove",
+        "couriers": "lalamove,gojek,grab,tiki,jne,jnt",
         "items": biteship_items
     }
 
@@ -567,9 +567,10 @@ async def biteship_webhook(request: Request):
 
 
 async def auto_book_biteship(order):
-    raw_courier = order.get("shipping_courier", "jne_reg").split("_")
-    c_company = raw_courier[0]
-    c_type = raw_courier[1] if len(raw_courier) > 1 else "reg"
+    raw_courier = order.get("shipping_courier", "jne_reg")
+    c_company, _, c_type = raw_courier.partition("_")
+    if not c_type:
+        c_type = "reg"
 
     payload = {
         "shipper_contact_name": "Rimpods Storage",
