@@ -575,6 +575,8 @@ async def auto_book_biteship(order):
         "shipper_contact_name": "Rimpods Storage",
         "shipper_contact_phone": "6282216594354",
         "shipper_contact_email": "admin@rimpods.com",
+        "origin_contact_name": "Rimpods Storage",
+        "origin_contact_phone": "6282216594354",
         "origin_coordinate": {"latitude": ORIGIN_LAT, "longitude": ORIGIN_LON},
         "origin_address": "Ruko Nirmala Jl Radar Selatan No 83, Pondok Gede, Bekasi",
         "origin_postal_code": int(ORIGIN_POSTAL),
