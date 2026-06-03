@@ -328,7 +328,7 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            {o.payment_channel === "midtrans" && o.status !== "paid" && (
+                            {o.payment_channel === "midtrans" && !(o.status === "paid" && o.shipping_awb) && (
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -337,7 +337,7 @@ export default function AdminDashboard() {
                                 className="bg-transparent border-[hsla(174,70%,55%,0.3)] text-[hsl(var(--reef-foam))] hover:bg-[hsla(174,70%,55%,0.1)] rounded-full text-xs h-8"
                               >
                                 <RefreshCcw className={`w-3 h-3 mr-1 ${syncing === o.order_number ? "animate-spin" : ""}`} />
-                                Cek Bayar
+                                {o.status === "paid" ? "Buat Kiriman" : "Cek Bayar"}
                               </Button>
                             )}
                             <WhatsAppQuickActions order={o} />
