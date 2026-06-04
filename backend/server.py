@@ -290,7 +290,7 @@ async def get_rates(req: RatesRequest):
         "origin_latitude": ORIGIN_LAT,
         "origin_longitude": ORIGIN_LON,
         "origin_postal_code": int(ORIGIN_POSTAL),
-        "couriers": "lalamove,gojek,grab,tiki,jne,jnt",
+        "couriers": "lalamove,gojek,grab,tiki,jne,jnt,paxel",
         "items": biteship_items
     }
 
@@ -310,10 +310,15 @@ async def get_rates(req: RatesRequest):
         raw_data = resp.json()
         formatted_rates = []
         for rate in raw_data.get("pricing", []):
-            c_name = rate["company"].upper()
-            s_name = rate["type"].upper()
+            company = rate["company"]
+            ctype = rate["type"]
+            # Paxel: hanya tampilkan Medium & Large (sembunyikan Small)
+            if company == "paxel" and ctype == "small":
+                continue
+            c_name = company.upper()
+            s_name = ctype.upper()
             formatted_rates.append({
-                "id": f"{rate['company']}_{rate['type']}",
+                "id": f"{company}_{ctype}",
                 "courier": c_name,
                 "service": s_name,
                 "cost": rate["price"],
