@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { ChevronLeft, ShoppingBag, CreditCard, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { saveReturningCustomer } from "../lib/customer";
+import { trackInitiateCheckout } from "../lib/tracker";
 import LocationPicker from "../components/LocationPicker";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -125,10 +126,20 @@ export default function Checkout() {
         payment_channel: channel,
         shipping_courier: shippingCourier
       };
-      
+      trackInitiateCheckout(payload.items, total);
+
       const { data } = await axios.post(`${API}/orders`, payload);
       // Ingat pelanggan ini untuk sapaan personal di kunjungan berikutnya
       saveReturningCustomer(form.name, form.phone);
+
+      const orderSummary = {
+        order_number: data.order_number,
+        total: data.total,
+        items: data.items,
+        channel,
+        whatsapp_url: data.whatsapp_url,
+        tokopedia_url: data.tokopedia_url,
+      };
 
       if (channel === "midtrans") {
         if (!window.snap) {
@@ -137,12 +148,21 @@ export default function Checkout() {
             return;
         }
         const tokenRes = await axios.post(`${API}/payment/midtrans/snap-token`, { order_id: data.id });
+        const finishOrder = () => {
+          sessionStorage.setItem(
+            "rimpods_last_order",
+            JSON.stringify({ ...orderSummary, midtrans_redirect_url: tokenRes.data.redirect_url })
+          );
+          clear();
+          navigate("/sukses");
+        };
         window.snap.pay(tokenRes.data.token, {
-          onSuccess: () => { toast.success("Pembayaran berhasil!"); clear(); navigate("/sukses"); },
-          onPending: () => { toast.info("Menunggu penyelesaian pembayaran."); clear(); navigate("/sukses"); },
+          onSuccess: () => { toast.success("Pembayaran berhasil!"); finishOrder(); },
+          onPending: () => { toast.info("Menunggu penyelesaian pembayaran."); finishOrder(); },
           onError: () => { toast.error("Pembayaran gagal."); setSubmitting(false); }
         });
       } else {
+        sessionStorage.setItem("rimpods_last_order", JSON.stringify(orderSummary));
         window.open(data.whatsapp_url, "_blank");
         clear();
         navigate("/sukses");
