@@ -41,7 +41,7 @@ export default function CartDrawer({ open, onOpenChange }) {
                 data-testid={`cart-item-${it.product_id}`}
                 className="flex gap-3 p-3 rounded-2xl bg-[hsla(192,55%,22%,0.5)] border border-[hsla(174,70%,55%,0.15)]"
               >
-                <img src={it.image} alt={it.name} className="w-20 h-20 rounded-xl object-cover" />
+                <img src={it.image} alt={it.name} loading="lazy" className="w-20 h-20 rounded-xl object-cover" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium leading-snug line-clamp-2">{it.name}</p>
                   <p className="text-[hsl(var(--reef-glow))] font-semibold text-sm mt-1">

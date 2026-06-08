@@ -152,8 +152,9 @@ export default function Landing() {
           <div className="lg:col-span-5 relative rise-in">
             <div className="glass-card glow-ring rounded-[2rem] p-3 rotate-1 bg-[hsla(8,30%,15%,0.4)]">
               <img
-                src="/aaaaa.png"
+                src="https://customer-assets.emergentagent.com/job_api-frontend-base/artifacts/1yj35xwu_reef_tank.webp"
                 alt="Reef tank coral mekar"
+                loading="lazy"
                 className="rounded-[1.6rem] w-full h-auto object-contain max-h-[600px]"
               />
               <div className="absolute -bottom-6 -left-6 hidden lg:block glass-card rounded-2xl px-5 py-4">
@@ -211,7 +212,7 @@ export default function Landing() {
                 style={{ animationDelay: `${idx * 80}ms` }}
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+                  <img src={p.image} alt={p.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
                   <div className="absolute top-3 left-3 flex gap-2">
                     {p.compare_price > p.price && (
                       <Badge className="coral-pill rounded-full px-3 py-1 text-xs font-semibold">
@@ -286,8 +287,9 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto px-5 lg:px-10 grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative">
             <img
-              src="https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/wmdlkyuf_Dramatic%205-Photo%20Visual%20Collage.png"
+              src="https://customer-assets.emergentagent.com/job_api-frontend-base/artifacts/hfo0rq8l_coral_closeup.webp"
               alt="Coral close up"
+              loading="lazy"
               className="rounded-[1.8rem] w-full h-auto object-contain max-h-[640px] glow-ring bg-[hsla(8,30%,15%,0.4)]"
             />
           </div>
@@ -443,6 +445,7 @@ export default function Landing() {
             <img
               src="https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/5gz4ojsf_Logo%20Transparant%20%284%29.png"
               alt="Rimpods"
+              loading="lazy"
               className="h-8 w-auto opacity-80"
             />
             <span>© {new Date().getFullYear()} · Dikultur dengan penuh perhatian di Bekasi</span>

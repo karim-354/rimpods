@@ -70,7 +70,7 @@ export default function UpsellModal({ open, onOpenChange, target }) {
           </button>
         </div>
         <div className="relative">
-          <img src={target.image} alt={target.name} className="w-full h-44 object-cover" />
+          <img src={target.image} alt={target.name} loading="lazy" className="w-full h-44 object-cover" />
           <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 coral-pill rounded-full px-3 py-1 text-xs font-bold">
             <Sparkles className="w-3 h-3" /> Rekomendasi dari Kami
           </div>

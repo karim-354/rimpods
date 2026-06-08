@@ -185,6 +185,7 @@ export default function AdminDashboard() {
               data-testid="admin-brand-logo"
               src="https://customer-assets.emergentagent.com/job_coral-product-hub/artifacts/5gz4ojsf_Logo%20Transparant%20%284%29.png"
               alt="Rimpods"
+              loading="lazy"
               className="h-8 w-auto"
             />
             <span className="h-4 w-px bg-[hsla(174,70%,55%,0.3)]" />
@@ -193,7 +194,7 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2 text-sm opacity-80">
               {user?.picture && (
-                <img src={user.picture} alt="" className="w-7 h-7 rounded-full" referrerPolicy="no-referrer" />
+                <img src={user.picture} alt="" loading="lazy" className="w-7 h-7 rounded-full" referrerPolicy="no-referrer" />
               )}
               <span data-testid="admin-user-email">{user?.email}</span>
             </div>
