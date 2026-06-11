@@ -13,8 +13,16 @@
 
   // 2) Reveal-on-scroll
   const els = document.querySelectorAll(".reveal");
-  // Failsafe: after 1.2s, force-reveal anything still hidden (prevents blank-state on slow IO)
-  setTimeout(() => els.forEach((el) => el.classList.add("in")), 1200);
+  // Failsafe: after 1.2s, force-reveal anything still hidden THAT IS IN THE
+  // VIEWPORT (prevents blank-state on slow IO). Off-screen elements keep
+  // their scroll-entrance animation.
+  setTimeout(() => {
+    els.forEach((el) => {
+      if (el.getBoundingClientRect().top < window.innerHeight * 1.15) {
+        el.classList.add("in");
+      }
+    });
+  }, 1200);
   if ("IntersectionObserver" in window && els.length) {
     const io = new IntersectionObserver(
       (entries) => {
@@ -28,6 +36,24 @@
       { rootMargin: "0px 0px -8% 0px", threshold: 0.05 }
     );
     els.forEach((el) => io.observe(el));
+    // Catch-up for fast flick scrolls: IO can miss elements that jump past
+    // the viewport between frames. Reveal anything already above the fold.
+    let pending = Array.from(els);
+    let revealRaf = null;
+    window.addEventListener("scroll", () => {
+      if (revealRaf || !pending.length) return;
+      revealRaf = requestAnimationFrame(() => {
+        revealRaf = null;
+        pending = pending.filter((el) => {
+          if (el.classList.contains("in")) return false;
+          if (el.getBoundingClientRect().bottom < 0) {
+            el.classList.add("in");
+            return false;
+          }
+          return true;
+        });
+      });
+    }, { passive: true });
   } else {
     els.forEach((el) => el.classList.add("in"));
   }

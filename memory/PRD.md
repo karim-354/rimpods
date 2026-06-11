@@ -327,3 +327,9 @@ Saat ini `EMAIL_ADMIN_NOTIFY=ocepjos@gmail.com` supaya testing bisa jalan. Resta
 - Desktop: logika asli dipertahankan (weave antar kolom, sort stabil tidak mengubah urutan).
 **CSS (`styles.css`):** media query max-width:767px → stroke line 3px, halo 8px opacity .3 blur 5px.
 **Verified:** screenshot mobile 390px (kurva S halus tunggal) & desktop 1920px (weave antar kolom seperti semula).
+
+## Feature: Entrance animation per-kartu di /torch/ (Jun 11, 2026)
+- Kartu stressor & solution (8 kartu) kini punya class `reveal` masing-masing → slide-up + scale(.96→1) + fade saat masuk viewport, stagger .07s via nth-child (styles.css).
+- Failsafe 1.2s di script.js diubah: hanya force-reveal elemen yang SUDAH di viewport (sebelumnya semua elemen → mematikan reveal-on-scroll).
+- Catch-up scroll handler: flick cepat yang membuat IO skip elemen → elemen di atas viewport (bottom<0) langsung di-reveal.
+- Verified: mobile 390px — kartu fade-in saat scroll (opacity mid-transition tertangkap), jump instan ke bawah tidak meninggalkan elemen hidden di atas viewport.
