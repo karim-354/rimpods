@@ -105,6 +105,15 @@ User clarifications:
     `/torch/index.html` dilayani langsung (200) di prod. Diverifikasi dgn simulasi server python
     yang meniru perilaku prod persis. CATATAN: `npx serve -s` TIDAK cocok utk simulasi (cleanUrls
     me-redirect /torch/index.html balik ke /torch → loop). Link iklan tercepat: /torch/index.html.
+- **Pixel funnel lengkap (Jun 2026)**:
+  - Direct-checkout `?add=` kini juga menembak **ViewContent + AddToCart** (Meta & TikTok, format sama
+    dgn tracker.js) setelah cart terisi — funnel iklan torch terbaca utuh: VC (torch) → VC+ATC (checkout)
+    → InitiateCheckout → Purchase (browser+CAPI).
+  - Landing React: `trackViewContent` (sebelumnya tak pernah dipanggil) kini ditembak SEKALI utk 3 produk
+    saat section #produk pertama terlihat (IntersectionObserver threshold .25, Landing.jsx).
+  - Teruji via stub pixel: 6 event VC (3 produk × 2 pixel) + VC/ATC direct-checkout dgn params benar.
+  - CATATAN TES: stub fbq/ttq harus dipasang SETELAH page load — defineProperty di init script bentrok
+    dgn loader TikTok (t.push is not a function = artefak tes, bukan bug).
 - **Meta Conversions API (CAPI) server-side**: `send_meta_capi_purchase()` di `backend/server.py`.
   Purchase event ditembak dari webhook Midtrans + admin sync-payment saat status `settlement/capture`.
   Dedup dgn pixel browser via event_id deterministik `purchase-{order_number}` (tracker.js ikut kirim eventID).

@@ -8,7 +8,7 @@ import { Badge } from "../components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { Star, Sparkles, Droplets, Shield, Waves, ChevronRight, Truck, MessageCircle, Heart, ExternalLink, Crown } from "lucide-react";
 import { toast } from "sonner";
-import { trackAddToCart } from "../lib/tracker";
+import { trackAddToCart, trackViewContent } from "../lib/tracker";
 import UpsellModal from "../components/UpsellModal";
 import ExitIntentModal from "../components/ExitIntentModal";
 import { getReturningCustomer, firstName } from "../lib/customer";
@@ -59,6 +59,21 @@ export default function Landing() {
       toast.error("Gagal muat produk, coba refresh.");
     });
   }, []);
+
+  // Pixel ViewContent: tembak sekali saat section produk pertama kali terlihat
+  useEffect(() => {
+    if (!products.length) return;
+    const sec = document.getElementById("produk");
+    if (!sec || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        products.forEach((p) => trackViewContent(p));
+        io.disconnect();
+      }
+    }, { threshold: 0.25 });
+    io.observe(sec);
+    return () => io.disconnect();
+  }, [products]);
 
   const handleAdd = (p) => {
     add(p, 1);

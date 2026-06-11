@@ -264,6 +264,18 @@
                   }
                   localStorage.setItem(KEY, JSON.stringify(cart));
                   window.dispatchEvent(new Event("rimpods:cart"));
+                  // Pixel funnel: ViewContent + AddToCart (Meta & TikTok)
+                  try {
+                    if (window.fbq) {
+                      window.fbq("track", "ViewContent", { content_ids: [p.id], content_type: "product", content_name: p.name, value: p.price, currency: "IDR" });
+                      window.fbq("track", "AddToCart", { content_ids: [p.id], content_type: "product", content_name: p.name, value: p.price * qty, currency: "IDR" });
+                    }
+                    if (window.ttq && window.ttq.track) {
+                      var contents = [{ content_id: p.id, content_name: p.name, price: p.price, quantity: qty }];
+                      window.ttq.track("ViewContent", { contents: contents, value: p.price, currency: "IDR" });
+                      window.ttq.track("AddToCart", { contents: contents, value: p.price * qty, currency: "IDR" });
+                    }
+                  } catch (e) {}
                   params.delete("add");
                   var qs = params.toString();
                   window.history.replaceState({}, "", window.location.pathname + (qs ? "?" + qs : "") + window.location.hash);
