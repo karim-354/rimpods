@@ -40,6 +40,18 @@ User clarifications:
 - **TikTok Pixel** sitewide id `CNQDS3JC77U0SCE9DUUG` — events: page, ViewContent, AddToCart, InitiateCheckout, SubmitForm, CompletePayment (siap closing dari ads GMV Max TikTok Shop)
 - Helper `/app/frontend/src/lib/tracker.js` exposes `trackAddToCart`, `trackInitiateCheckout`, `trackLead`, `trackPurchase` — guarded against ad-blocker (no-throw)
 
+### v3 (Jun 2026)
+- **Mythos Throughline embed** (`frontend/public/mythos-throughline.js` v2 + config di `public/index.html`):
+  garis neon scroll-drawn dari hero H1 → kartu produk → section cerita/cara-pakai/testimoni/faq →
+  **bercabang (fork) jadi 2 panah gold** menunjuk CTA "Mulai Belanja" & "Konsultasi dengan Kami".
+  Eye-level sync, gradient warna per section, SPA-aware (non-aktif otomatis di /checkout /sukses /admin).
+- **Meta Conversions API (CAPI) server-side**: `send_meta_capi_purchase()` di `backend/server.py`.
+  Purchase event ditembak dari webhook Midtrans + admin sync-payment saat status `settlement/capture`.
+  Dedup dgn pixel browser via event_id deterministik `purchase-{order_number}` (tracker.js ikut kirim eventID).
+  Email/phone di-SHA256 (phone dinormalisasi 62xxx). Idempotent via flag `meta_capi_sent` di order.
+  Env: `META_PIXEL_ID`, `META_CAPI_ACCESS_TOKEN`, opsional `META_CAPI_TEST_EVENT_CODE` (backend/.env).
+  Token tervalidasi live; dry-run full code path OK tanpa mencatat event palsu.
+
 ## Backlog (P1/P2)
 - P1: Real photos dari Rimpods (sekarang pakai stock Unsplash)
 - P1: Logo Rimpods dari Google Drive (link disediakan, perlu download manual)

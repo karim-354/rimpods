@@ -31,6 +31,10 @@ export const trackLead = (order) => {
 
 export const trackPurchase = (order) => {
   const contents = (order.items || []).map((i) => ({ content_id: i.product_id, content_name: i.name, price: i.price, quantity: i.quantity }));
-  fbq("track", "Purchase", { value: order.total, currency: "IDR", content_ids: contents.map((c) => c.content_id), num_items: contents.length });
-  ttq("CompletePayment", { contents, value: order.total, currency: "IDR" });
+  // event_id deterministik utk dedup dgn server-side Meta CAPI (webhook Midtrans)
+  const eventId = order.order_number ? `purchase-${order.order_number}` : undefined;
+  fbq("track", "Purchase",
+    { value: order.total, currency: "IDR", content_ids: contents.map((c) => c.content_id), num_items: contents.length },
+    eventId ? { eventID: eventId } : undefined);
+  ttq("CompletePayment", { contents, value: order.total, currency: "IDR", ...(eventId ? { event_id: eventId } : {}) });
 };

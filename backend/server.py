@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 import base64
+import hashlib
 import httpx
 import pymongo
 from urllib.parse import quote
@@ -33,6 +34,68 @@ MIDTRANS_SERVER_KEY = os.getenv("MIDTRANS_SERVER_KEY")
 MIDTRANS_IS_PRODUCTION = os.getenv("MIDTRANS_IS_PRODUCTION", "true").lower() == "true"
 MIDTRANS_STATUS_BASE = "https://api.midtrans.com" if MIDTRANS_IS_PRODUCTION else "https://api.sandbox.midtrans.com"
 WA_ADMIN_NUMBER = os.getenv("WA_ADMIN_NUMBER", "6282216594354")
+
+META_PIXEL_ID = os.getenv("META_PIXEL_ID")
+META_CAPI_ACCESS_TOKEN = os.getenv("META_CAPI_ACCESS_TOKEN")
+META_CAPI_TEST_EVENT_CODE = os.getenv("META_CAPI_TEST_EVENT_CODE")
+
+
+async def send_meta_capi_purchase(order: dict):
+    """Kirim event Purchase server-side ke Meta Conversions API.
+    Dedup dengan pixel browser via event_id 'purchase-{order_number}'.
+    Idempotent: dilewati jika order sudah ditandai meta_capi_sent."""
+    if not META_PIXEL_ID or not META_CAPI_ACCESS_TOKEN:
+        return
+    if order.get("meta_capi_sent"):
+        return
+
+    contact = order.get("contact") or {}
+    user_data = {}
+    email = (contact.get("email") or "").strip().lower()
+    if email:
+        user_data["em"] = hashlib.sha256(email.encode()).hexdigest()
+    phone = re.sub(r"\D", "", contact.get("phone") or "")
+    if phone.startswith("0"):
+        phone = "62" + phone[1:]
+    if phone:
+        user_data["ph"] = hashlib.sha256(phone.encode()).hexdigest()
+    if not user_data:
+        return  # Meta wajib minimal 1 identifier
+
+    items = order.get("items") or []
+    event = {
+        "event_name": "Purchase",
+        "event_time": int(datetime.now(timezone.utc).timestamp()),
+        "event_id": f"purchase-{order['order_number']}",
+        "action_source": "website",
+        "event_source_url": "https://rimpods.com/sukses",
+        "user_data": user_data,
+        "custom_data": {
+            "currency": "IDR",
+            "value": float(order.get("total") or 0),
+            "content_type": "product",
+            "content_ids": [i.get("product_id") for i in items if i.get("product_id")],
+            "num_items": sum(int(i.get("quantity") or 1) for i in items),
+        },
+    }
+    payload = {"data": [event]}
+    if META_CAPI_TEST_EVENT_CODE:
+        payload["test_event_code"] = META_CAPI_TEST_EVENT_CODE
+
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.post(
+            f"https://graph.facebook.com/v18.0/{META_PIXEL_ID}/events",
+            params={"access_token": META_CAPI_ACCESS_TOKEN},
+            json=payload,
+        )
+    if resp.status_code == 200:
+        db.orders.update_one(
+            {"order_number": order["order_number"]},
+            {"$set": {"meta_capi_sent": True}},
+        )
+        print(f"Meta CAPI Purchase terkirim: {order['order_number']}")
+    else:
+        print(f"Meta CAPI gagal ({resp.status_code}): {resp.text}")
 
 ORIGIN_LAT = -6.259636
 ORIGIN_LON = 106.906426
@@ -476,6 +539,12 @@ async def midtrans_webhook(request: Request):
                 await auto_book_biteship(order_data)
             except Exception as e:
                 print(f"Biteship auto-book gagal: {e}")
+        # Meta CAPI: Purchase server-side (dedup dgn pixel browser via event_id)
+        if order_data:
+            try:
+                await send_meta_capi_purchase(order_data)
+            except Exception as e:
+                print(f"Meta CAPI error: {e}")
 
     db.orders.update_one(
         {"order_number": order_number},
@@ -525,6 +594,12 @@ async def admin_sync_payment(order_number: str, admin=Depends(_require_admin)):
             booked = True
         except Exception as e:
             biteship_error = str(e)
+
+    if new_status == "paid":
+        try:
+            await send_meta_capi_purchase(order)
+        except Exception as e:
+            print(f"Meta CAPI error: {e}")
 
     db.orders.update_one(
         {"order_number": order_number},
