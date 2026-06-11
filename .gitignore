@@ -87,3 +87,4 @@ credentials.json
 *.key
 .credentials
 ENV_BACKUP_RIMPODS.docx
+env-backup-*.docx
