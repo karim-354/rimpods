@@ -10,6 +10,7 @@ const Checkout = lazy(() => import("./pages/Checkout"));
 const Success = lazy(() => import("./pages/Success"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AuthCallback = lazy(() => import("./pages/admin/AuthCallback"));
+const WallOfReefs = lazy(() => import("./pages/WallOfReefs"));
 
 // Produksi: static server tidak me-resolve directory index utk /torch/,
 // SPA fallback menangkapnya → halaman kosong. Redirect ke file statisnya.
@@ -35,6 +36,7 @@ function AppRouter() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/sukses" element={<Success />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/testimoni" element={<WallOfReefs />} />
         <Route path="/torch" element={<TorchRedirect />} />
         <Route path="/torch/*" element={<TorchRedirect />} />
       </Routes>

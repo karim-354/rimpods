@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 from auth import build_auth_router
 from admin import build_admin_router
+from testimonials import build_testimonials_router, seed_testimonials
 
 load_dotenv()
 app = FastAPI(title="Rimpods Monolith Production API")
@@ -118,6 +119,8 @@ app.add_middleware(
 _auth_router, _current_user, _require_admin = build_auth_router(async_db)
 app.include_router(_auth_router)
 app.include_router(build_admin_router(async_db, _require_admin))
+app.include_router(build_testimonials_router(async_db, _require_admin))
+seed_testimonials(db)
 
 # ==========================================
 # PRODUCT CATALOG (source of truth) + idempotent seed

@@ -392,6 +392,13 @@ export default function Landing() {
               </figure>
             ))}
           </div>
+          <div className="text-center mt-10">
+            <a href="/testimoni" data-testid="landing-wall-link">
+              <Button variant="outline" className="bg-transparent border-[hsla(174,70%,55%,0.4)] text-[hsl(var(--reef-foam))] hover:bg-[hsla(174,70%,55%,0.1)] h-12 px-7 rounded-full">
+                Baca 1.451+ ulasan asli pembeli →
+              </Button>
+            </a>
+          </div>
         </div>
       </section>
 
