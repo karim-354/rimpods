@@ -286,3 +286,34 @@ Saat ini `EMAIL_ADMIN_NOTIFY=ocepjos@gmail.com` supaya testing bisa jalan. Resta
 - P2: Produk low-ticket untuk coverage voucher-ineligible
 - P2: English version
 - P2: Abandoned cart WhatsApp nudge
+
+---
+
+## [2026-02-11] Torch Landing Pixel Funnel Fix
+**Issue:** User scan rimpods.com/torch/ — hanya `PageView` yang fire. `ViewContent`, `AddToCart`, `InitiateCheckout`, `Purchase` ga terdeteksi di source code page-nya.
+
+**Root Cause:**
+- `ViewContent` ada di `script.js` tapi nunggu DOMContentLoaded — pixel scanner cepet eksekusi sebelum dipanggil.
+- `script.js` salah fire `InitiateCheckout` di CTA click (harusnya `AddToCart`, karena IC milestone-nya di halaman /checkout).
+- Tidak ada deduplikasi click protection.
+
+**Fix:**
+- `/app/frontend/public/torch/index.html`:
+  - `ViewContent` (Meta + TikTok) inline di `<head>` — fire **immediately** setelah PageView, sebelum DOM ready. Pixel scanner langsung detect.
+  - Product config global: `window.__TORCH_PRODUCT`.
+- `/app/frontend/public/torch/script.js`:
+  - Hapus duplikat initial `ViewContent` (sudah di head).
+  - Tetap pertahankan 2nd `ViewContent` saat offer section masuk viewport (strong intent signal).
+  - **Ubah `InitiateCheckout` → `AddToCart`** di handler CTA click (4 tombol: hero/final/footer/sticky).
+  - Dedup flag 1.5s + delay navigasi 200ms supaya beacon pixel ke-flush sebelum cross-origin redirect.
+
+**Funnel sekarang (full):**
+| Event | Tempat | Status |
+|---|---|---|
+| PageView | `/torch/` head | ✅ |
+| ViewContent | `/torch/` head (immediate) + offer section IntersectionObserver | ✅ |
+| AddToCart | `/torch/` click CTA → cross-origin navigate ke rimpods.com/checkout | ✅ |
+| InitiateCheckout | rimpods.com/checkout (React SPA, pixel ID sama) | ✅ |
+| Purchase | rimpods.com/sukses (client) + Meta CAPI webhook (server, dedup via `event_id=purchase-{order_number}`) | ✅ |
+
+**Tested:** 4/4 CTA fire AddToCart ✓, no stray InitiateCheckout ✓, PageView + ViewContent fire di awal ✓.

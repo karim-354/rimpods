@@ -284,12 +284,13 @@
 
 // ============================================================
 // PIXEL TRACKING — Meta (354153630789298) + TikTok (CNQDS3JC77U0SCE9DUUG)
-// Funnel di landing ini:
-//   PageView        -> otomatis saat load (di-init dari <head>)
-//   ViewContent     -> saat load (produk 2L) + saat section penawaran terlihat
-//   InitiateCheckout-> saat klik CTA checkout mana pun (hero/final/footer/sticky)
-//   Purchase/CompletePayment -> terjadi di rimpods.com (/sukses) dengan pixel
-//                              ID yang sama, sehingga atribusi tetap satu induk.
+// Funnel di landing /torch/ :
+//   PageView         -> otomatis saat load (di-init dari <head>)
+//   ViewContent      -> di <head> (immediate) + saat section penawaran terlihat
+//   AddToCart        -> saat klik CTA checkout mana pun (hero/final/footer/sticky)
+//   InitiateCheckout -> di rimpods.com/checkout (React SPA, pixel ID sama)
+//   Purchase         -> di rimpods.com/sukses + server-side via Meta CAPI
+//                       (event_id deterministik utk dedup)
 // ============================================================
 (function () {
   "use strict";
@@ -326,16 +327,8 @@
     currency: PRODUCT.currency
   };
 
-  // 1) ViewContent — sekali saat halaman produk ini dibuka
-  function fireViewContent() {
-    fbTrack("ViewContent", fbParams);
-    ttTrack("ViewContent", ttParams);
-  }
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", fireViewContent);
-  } else {
-    fireViewContent();
-  }
+  // 1) ViewContent — initial fire sudah dilakukan inline di <head> (lebih cepat,
+  //    tidak nunggu DOMContentLoaded). Skip di sini agar tidak ada event duplikat.
 
   // 2) ViewContent kedua (sinyal kuat) — saat section penawaran masuk layar
   var offerSeen = false;
@@ -354,14 +347,39 @@
     io.observe(offer);
   }
 
-  // 3) InitiateCheckout — klik CTA checkout mana pun
+  // 3) AddToCart — klik CTA checkout mana pun di /torch/ landing
+  //    Funnel: PageView → ViewContent → AddToCart (klik) → InitiateCheckout (di /checkout)
+  //    InitiateCheckout & Purchase di-fire oleh React SPA di rimpods.com/checkout & /sukses
+  //    (pixel ID sama → atribusi tetap satu induk).
   var CTA_IDS = ["hero-cta-checkout", "final-cta-checkout", "footer-cta", "sticky-mobile-cta"];
+  var atcFired = false;
+  function fireAddToCart() {
+    if (atcFired) return;          // dedup double-click
+    atcFired = true;
+    fbTrack("AddToCart", fbParams);
+    ttTrack("AddToCart", ttParams);
+    // reset setelah 1.5s biar fire lagi kalo user balik & klik tombol lain
+    setTimeout(function () { atcFired = false; }, 1500);
+  }
   CTA_IDS.forEach(function (id) {
     var el = document.querySelector('[data-testid="' + id + '"]');
     if (!el) return;
-    el.addEventListener("click", function () {
-      fbTrack("InitiateCheckout", fbParams);
-      ttTrack("InitiateCheckout", ttParams);
+    el.addEventListener("click", function (e) {
+      var href = el.getAttribute("href") || "";
+      // Kalau anchor internal (#cta-final dll) atau tanpa /checkout, skip ATC
+      if (href.indexOf("/checkout") === -1) {
+        fireAddToCart(); // tetap fire untuk nav-cta yg scroll ke offer (intent kuat)
+        return;
+      }
+      // Modifier/middle/right click: fire & biarin browser handle (new tab dll)
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (e.button && e.button !== 0)) {
+        fireAddToCart();
+        return;
+      }
+      e.preventDefault();
+      fireAddToCart();
+      // Beri 200ms supaya beacon pixel ke-flush sebelum navigasi cross-origin
+      setTimeout(function () { window.location.href = el.href; }, 200);
     });
   });
 })();
