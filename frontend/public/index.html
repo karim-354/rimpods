@@ -95,6 +95,31 @@
         </a>
         
         <script>
+          window.MYTHOS_CONFIG = {
+            startSelector: '[data-testid="hero-title"]',
+            branches: [
+              { selector: '[data-testid="cta-shop-btn"]' },
+              { selector: '[data-testid="cta-wa-btn"]' }
+            ],
+            anchors: [
+              { selector: '[data-testid="product-card-paket-hemat-5r-1p"]', side: 'left', offset: -14 },
+              { selector: '#cerita', side: 'center', offset: -240 },
+              { selector: '#cara-pakai', side: 'center', offset: 240 },
+              { selector: '#testimoni', side: 'center', offset: -240 },
+              { selector: '#faq', side: 'center', offset: 200 }
+            ],
+            sectionColors: [
+              ['[data-testid="hero-title"]', '#35DBC9'],
+              ['#produk', '#F4604A'],
+              ['#cerita', '#5EEAD4'],
+              ['#testimoni', '#F4845F'],
+              ['[data-testid="cta-shop-btn"]', '#F5C542']
+            ],
+            arrowColor: '#F5C542'
+          };
+        </script>
+        <script src="%PUBLIC_URL%/mythos-throughline.js" defer></script>
+        <script>
             !(function (t, e) {
                 var o, n, p, r;
                 e.__SV ||
