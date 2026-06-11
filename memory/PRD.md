@@ -57,6 +57,11 @@ User clarifications:
   - snap.js Midtrans & emergent-main.js diberi defer.
   - Hero image: fetchPriority="high" + decoding async + <link rel="preload"> (sebelumnya loading="lazy" — buruk utk LCP).
   - Preconnect ke customer-assets.emergentagent.com. Logo header tidak lagi lazy.
+  - **Logo PNG (105–135KB) → WebP lokal 5–7KB** di `frontend/public/img/` (brand.js + footer diarahkan ke /img/*.webp).
+- **Mythos v3 (di bawah teks)**: cage zIndex 1 + semua container konten section diberi `relative z-10`
+  → garis lewat DI BAWAH teks/kartu (terlihat di ruang kosong & samar menembus glass-card).
+  Start point pindah ke badge "Pakan coral hidup" (startSide: 'right' — keluar horizontal ke kanan
+  via cubicH, turun di celah kiri gambar hero), guard clamp di lengthAtY utk segmen horizontal.
 - **Meta Conversions API (CAPI) server-side**: `send_meta_capi_purchase()` di `backend/server.py`.
   Purchase event ditembak dari webhook Midtrans + admin sync-payment saat status `settlement/capture`.
   Dedup dgn pixel browser via event_id deterministik `purchase-{order_number}` (tracker.js ikut kirim eventID).

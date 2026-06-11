@@ -151,6 +151,15 @@
       rnd(p1.x) + " " + rnd(p1.y - dy * k) + ", " + rnd(p1.x) + " " + rnd(p1.y);
   }
 
+  // Segmen pertama saat startSide 'right': keluar horizontal ke kanan,
+  // lalu melengkung turun masuk ke anchor berikutnya
+  function cubicH(p0, p1) {
+    var rnd = function (n) { return n.toFixed(1); };
+    var dx = p1.x - p0.x, dy = p1.y - p0.y;
+    return " C " + rnd(p0.x + dx * 0.6) + " " + rnd(p0.y) + ", " +
+      rnd(p1.x) + " " + rnd(p1.y - dy * 0.55) + ", " + rnd(p1.x) + " " + rnd(p1.y);
+  }
+
   function buildPath() {
     var start = document.querySelector(CFG.startSelector);
     var svg = document.getElementById("mythos-canvas");
@@ -216,7 +225,11 @@
 
     // Anchor points garis utama
     var s = abs(start);
-    var pts = [{ x: s.cx, y: s.bottom + CFG.startGap }];
+    var pts = [
+      CFG.startSide === "right"
+        ? { x: s.right + CFG.startGap, y: s.cy }
+        : { x: s.cx, y: s.bottom + CFG.startGap }
+    ];
     touchEls.forEach(function (t) { t.el.classList.remove("mythos-touch"); });
     touchEls = [];
     CFG.anchors.forEach(function (a) {
@@ -240,7 +253,9 @@
     pts.push(forkPt);
 
     var d = "M " + pts[0].x.toFixed(1) + " " + pts[0].y.toFixed(1);
-    for (var i = 1; i < pts.length; i++) d += cubic(pts[i - 1], pts[i]);
+    for (var i = 1; i < pts.length; i++) {
+      d += (i === 1 && CFG.startSide === "right") ? cubicH(pts[0], pts[1]) : cubic(pts[i - 1], pts[i]);
+    }
     line.setAttribute("d", d);
     halo.setAttribute("d", d);
     line.setAttribute("marker-end", singleMode ? "url(#mythosArrow)" : "");
@@ -308,6 +323,7 @@
     }
     var a = lenSamples[lo], b = lenSamples[hi];
     var t = (y - a.y) / Math.max(1e-6, b.y - a.y);
+    t = Math.max(0, Math.min(1, t)); // guard utk segmen horizontal (dy ~ 0)
     return a.l + t * (b.l - a.l);
   }
 

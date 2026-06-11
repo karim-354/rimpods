@@ -98,12 +98,15 @@
         
         <script>
           window.MYTHOS_CONFIG = {
-            startSelector: '[data-testid="hero-title"]',
+            startSelector: '[data-testid="hero-badge"]',
+            startSide: 'right',
+            zIndex: 1,
             branches: [
               { selector: '[data-testid="cta-shop-btn"]' },
               { selector: '[data-testid="cta-wa-btn"]' }
             ],
             anchors: [
+              { selector: 'img[alt="Reef tank coral mekar"]', side: 'left', offset: -44 },
               { selector: '[data-testid="add-to-cart-rotifer-2l-phyto"]', side: 'center', yOffset: -22, touch: true },
               { selector: '[data-testid="add-to-cart-paket-hemat-5r-1p"]', side: 'center', touch: true },
               { selector: '[data-testid="add-to-cart-tbn-turn-back-nutrients"]', side: 'center', yOffset: 22, touch: true },
@@ -113,7 +116,7 @@
               { selector: '#faq', side: 'center', offset: 200 }
             ],
             sectionColors: [
-              ['[data-testid="hero-title"]', '#35DBC9'],
+              ['[data-testid="hero-badge"]', '#35DBC9'],
               ['#produk', '#F4604A'],
               ['#cerita', '#5EEAD4'],
               ['#testimoni', '#F4845F'],
