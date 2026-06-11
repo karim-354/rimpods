@@ -83,7 +83,7 @@ export default function Landing() {
       <section className="relative overflow-hidden">
         <Bubbles />
         <div className="caustics absolute inset-0" />
-        <div className="relative z-10 max-w-7xl mx-auto px-5 lg:px-10 pt-16 pb-24 lg:pt-28 lg:pb-32 grid lg:grid-cols-12 gap-12 items-center">
+        <div className="relative max-w-7xl mx-auto px-5 lg:px-10 pt-16 pb-24 lg:pt-28 lg:pb-32 grid lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7 rise-in">
             {returningCustomer && (returningCustomer.name || returningCustomer.phone) && (
               <div
@@ -191,7 +191,7 @@ export default function Landing() {
 
       {/* PRODUK */}
       <section id="produk" className="relative py-24 lg:py-32">
-        <div className="relative z-10 max-w-7xl mx-auto px-5 lg:px-10">
+        <div className="max-w-7xl mx-auto px-5 lg:px-10">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
             <div>
               <Badge className="bg-[hsla(8,89%,64%,0.15)] text-[hsl(var(--reef-coral))] border border-[hsla(8,89%,64%,0.4)] rounded-full px-4 py-1 mb-4">
@@ -285,7 +285,7 @@ export default function Landing() {
 
       {/* CERITA */}
       <section id="cerita" className="relative py-24 lg:py-32 bg-[hsl(var(--reef-mid))]">
-        <div className="relative z-10 max-w-6xl mx-auto px-5 lg:px-10 grid lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-6xl mx-auto px-5 lg:px-10 grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative">
             <img
               src="https://customer-assets.emergentagent.com/job_api-frontend-base/artifacts/hfo0rq8l_coral_closeup.webp"
@@ -328,7 +328,7 @@ export default function Landing() {
 
       {/* CARA PAKAI */}
       <section id="cara-pakai" className="py-24 lg:py-32">
-        <div className="relative z-10 max-w-6xl mx-auto px-5 lg:px-10">
+        <div className="max-w-6xl mx-auto px-5 lg:px-10">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <Badge className="bg-[hsla(8,89%,64%,0.15)] text-[hsl(var(--reef-coral))] border border-[hsla(8,89%,64%,0.4)] rounded-full px-4 py-1 mb-4">
               Cara Pakai
@@ -353,7 +353,7 @@ export default function Landing() {
 
       {/* TESTIMONI */}
       <section id="testimoni" className="py-24 lg:py-32 bg-[hsl(var(--reef-mid))]">
-        <div className="relative z-10 max-w-6xl mx-auto px-5 lg:px-10">
+        <div className="max-w-6xl mx-auto px-5 lg:px-10">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <Badge className="bg-[hsla(174,70%,55%,0.15)] text-[hsl(var(--reef-glow))] border border-[hsla(174,70%,55%,0.3)] rounded-full px-4 py-1 mb-4">
               Suara Reefer
@@ -382,7 +382,7 @@ export default function Landing() {
 
       {/* FAQ */}
       <section id="faq" className="py-24 lg:py-32">
-        <div className="relative z-10 max-w-3xl mx-auto px-5 lg:px-10">
+        <div className="max-w-3xl mx-auto px-5 lg:px-10">
           <div className="text-center mb-12">
             <h2 className="font-display text-4xl lg:text-5xl tracking-tight">Pertanyaan yang sering dititipkan.</h2>
           </div>
@@ -410,7 +410,7 @@ export default function Landing() {
 
       {/* CTA */}
       <section className="py-20">
-        <div className="relative z-10 max-w-5xl mx-auto px-5 lg:px-10">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10">
           <div className="glass-card rounded-[2rem] p-10 lg:p-14 text-center relative overflow-hidden">
             <Bubbles />
             <h2 className="font-display text-4xl lg:text-5xl tracking-tight relative">Tank kamu siap memperlihatkan potensinya.</h2>

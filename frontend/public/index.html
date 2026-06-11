@@ -107,14 +107,22 @@
             ],
             anchors: [
               { selector: 'img[alt="Reef tank coral mekar"]', side: 'center' },
-              { selector: '[data-testid="add-to-cart-rotifer-2l-phyto"]', side: 'center', yOffset: -22, touch: true },
+              { selector: '[data-testid="product-card-paket-hemat-5r-1p"]', side: 'left', offset: -18, yOffset: -300 },
+              { selector: '[data-testid="product-card-paket-hemat-5r-1p"]', side: 'left', offset: -18, yOffset: 250 },
+              { selector: '[data-testid="add-to-cart-rotifer-2l-phyto"]', side: 'center', touch: true },
+              { selector: '[data-testid="add-to-cart-paket-hemat-5r-1p"]', side: 'left', offset: 30, yOffset: -34 },
               { selector: '[data-testid="add-to-cart-paket-hemat-5r-1p"]', side: 'center', touch: true },
-              { selector: '[data-testid="add-to-cart-tbn-turn-back-nutrients"]', side: 'center', yOffset: 22, touch: true },
+              { selector: '[data-testid="add-to-cart-tbn-turn-back-nutrients"]', side: 'left', offset: 30, yOffset: -34 },
+              { selector: '[data-testid="add-to-cart-tbn-turn-back-nutrients"]', side: 'center', touch: true },
               { selector: '#cerita', side: 'center', offset: -240 },
-              { selector: '#cara-pakai', side: 'center', offset: 240 },
-              { selector: '#testimoni', side: 'center', offset: -240 },
-              { selector: '#faq', side: 'center', offset: 200 }
+              { selector: '#cara-pakai', side: 'center', offset: 660 },
+              { selector: '#testimoni', side: 'center', offset: -640 },
+              { selector: '#faq', side: 'center', offset: 560 },
+              { selector: '[data-testid="cta-shop-btn"]', side: 'left', offset: -430, yOffset: -180 },
+              { selector: '[data-testid="cta-shop-btn"]', side: 'left', offset: -430, yOffset: -44 }
             ],
+            forkGap: 20,
+            endGap: -24,
             sectionColors: [
               ['[data-testid="hero-badge"]', '#35DBC9'],
               ['#produk', '#F4604A'],

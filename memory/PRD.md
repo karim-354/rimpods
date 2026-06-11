@@ -63,9 +63,20 @@ User clarifications:
   Start point pindah ke badge "Pakan coral hidup" (startSide: 'bottom-left' — mulai dari kiri-bawah badge,
   keluar horizontal ke kanan via cubicH, melengkung turun ke TENGAH gambar hero — menyelam di balik gambar),
   guard clamp di lengthAtY utk segmen horizontal.
-  CATATAN BUG (Jun 2026): edit z-10 di container hero sempat tidak tersimpan (silent fail) → garis tampil
-  di atas gambar hero. Sudah di-reapply; total 7 container ber-`relative z-10`. Produk TIDAK pernah hilang
-  di preview (diverifikasi 2x screenshot, 3 kartu render normal).
+- **Mythos v4 — "di bawah teks, di atas box" (premium layering, Jun 2026)**:
+  - Hierarki: background < box/kartu/gambar < garis SVG (cage z:1) < teks.
+  - CSS `section :is(h1,h2,h3,h4,p,li,blockquote){position:relative;z-index:10}` di index.css mengangkat semua teks di atas garis. SEMUA `z-10` container di Landing.jsx DIHAPUS (0 tersisa).
+  - Teks dlm glass-card (stacking ctx backdrop-filter) tak bisa diangkat → rute garis dirancang menghindarinya:
+    produk: turun via celah antar kartu 1-2 (anchor card2 left -18, yOffset -300 & +250), dip ke tombol1,
+    rise di atas harga (b.left+30, yOffset -34), dip tombol2, rise, dip tombol3, keluar bawah.
+    cerita: tetap -240 (melintas di atas gambar kolase = box, diizinkan). cara-pakai: offset 660 (margin kanan luar).
+    testimoni: -640 (margin kiri luar). faq: 560 (margin kanan luar).
+    CTA: turun di luar kiri kartu (2 anchor cta-shop-btn left -430, yOffset -180 & -44), masuk via celah
+    whitespace di bawah paragraf, forkGap 20, endGap -24 → panah & dot cabang mendarat DI tombol.
+  - Fix js: epsilon 2px utk segmen horizontal datar (garis berhenti dini krn float mismatch), running-max
+    monotonic di lenSamples (dukung dip/wave naik-turun kecil).
+  - PELAJARAN: JANGAN edit paralel banyak search_replace pada SATU file — 2 dari 9 edit Landing.jsx hilang
+    (race condition) walau dilaporkan sukses. Edit file yang sama harus berurutan + verifikasi grep.
 - **Meta Conversions API (CAPI) server-side**: `send_meta_capi_purchase()` di `backend/server.py`.
   Purchase event ditembak dari webhook Midtrans + admin sync-payment saat status `settlement/capture`.
   Dedup dgn pixel browser via event_id deterministik `purchase-{order_number}` (tracker.js ikut kirim eventID).

@@ -64,6 +64,14 @@ body {
     linear-gradient(180deg, hsl(var(--reef-deep)) 0%, hsl(198 70% 5%) 100%);
 }
 
+/* ===== MYTHOS LAYERING =====
+   Garis SVG (z-index 1) berjalan DI ATAS box/kartu/gambar
+   tapi DI BAWAH semua teks (elemen teks diangkat ke z-10). */
+section :is(h1, h2, h3, h4, p, li, blockquote) {
+  position: relative;
+  z-index: 10;
+}
+
 .glass-card {
   background: linear-gradient(180deg, hsla(192, 55%, 22%, 0.55), hsla(198, 60%, 12%, 0.55));
   backdrop-filter: blur(18px);

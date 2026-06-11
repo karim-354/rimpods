@@ -300,9 +300,12 @@
     // Arc-length -> Y lookup (eye-level presisi di path berkelok)
     var SAMPLES = Math.max(200, Math.round(pathLength / 24));
     lenSamples = new Array(SAMPLES + 1);
+    var runMaxY = -Infinity;
     for (var j = 0; j <= SAMPLES; j++) {
       var l = (pathLength * j) / SAMPLES;
-      lenSamples[j] = { l: l, y: line.getPointAtLength(l).y };
+      // running-max: jaga monotonic Y walau path sedikit naik (dip/wave kecil)
+      runMaxY = Math.max(runMaxY, line.getPointAtLength(l).y);
+      lenSamples[j] = { l: l, y: runMaxY };
     }
 
     startY = s.top;
@@ -344,7 +347,11 @@
     var progress = Math.max(0, Math.min(1, (viewportCenter - startY) / total));
     var targetY = startY + progress * (endY - startY);
 
-    var offset = pathLength - lengthAtY(Math.min(targetY, forkY));
+    // Garis utama berhenti di fork. Epsilon 2px utk segmen horizontal datar
+    // (pembulatan path d vs forkY float bisa bikin lengthAtY berhenti dini).
+    var offset = (targetY >= forkY - 2)
+      ? 0
+      : pathLength - lengthAtY(Math.min(targetY, forkY));
     line.style.strokeDashoffset = offset;
     if (halo) halo.style.strokeDashoffset = offset;
 
