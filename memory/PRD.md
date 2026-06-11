@@ -87,6 +87,18 @@ User clarifications:
   - `.mythos-touch` dipisah: `a.mythos-touch{display:inline-block}` saja (display inline-block di div block
     merusak layout). Touch target singleMode = elemen endSelector.
   - Desktop tidak berubah (regresi dicek: fork 2 cabang + dots tetap jalan).
+- **Landing statis /torch/ + Direct-checkout (Jun 2026)**:
+  - `frontend/public/torch/` — landing "Torch Defender Pack" (index.html, styles.css, script.js, 13 webp)
+    diunduh apa adanya dari project mythos-throughline; injeksi dev server (bundle.js, visual-edit-overlay,
+    cdn.tailwindcss) DIHAPUS dari index.html. Pixel Meta/TikTok & CTA utuh.
+  - script.js ditambah add-on COMET HEAD (adopsi visual induk: dot twinkle + ripple di ujung garis,
+    rAF loop baca strokeDashoffset — tidak mengubah logika garis asli).
+  - React tidak menangkap /torch/ (static public/ dilayani lebih dulu, dev & build sama).
+  - **Direct-checkout**: script di `frontend/public/index.html` sebelum </body> — baca `?add=<id>:<qty>`,
+    fetch /api/products, tulis localStorage `rimpods_cart_v1`, dispatch `rimpods:cart` (useCart sync live),
+    hapus param `add` via replaceState (utm_source dipertahankan utk atribusi).
+  - Teruji: /torch/ render (eye-delta 0, 13 gambar, CTA benar); /checkout?add=rotifer-2l-phyto:2 →
+    cart qty 2 weight_kg 3, URL bersih jadi /checkout?utm_source=torch-landing.
 - **Meta Conversions API (CAPI) server-side**: `send_meta_capi_purchase()` di `backend/server.py`.
   Purchase event ditembak dari webhook Midtrans + admin sync-payment saat status `settlement/capture`.
   Dedup dgn pixel browser via event_id deterministik `purchase-{order_number}` (tracker.js ikut kirim eventID).

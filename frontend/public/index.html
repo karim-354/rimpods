@@ -220,5 +220,57 @@
                 },
             });
         </script>
+        <script>
+          // Direct-checkout: /checkout?add=<product_id>:<qty>
+          // Isi keranjang (localStorage rimpods_cart_v1) lalu bersihkan param.
+          // Dipakai landing eksternal (mis. /torch/) agar CTA langsung ke checkout terisi.
+          (function () {
+            try {
+              var params = new URLSearchParams(window.location.search);
+              var add = params.get("add");
+              if (!add) return;
+              var parts = add.split(":");
+              var pid = parts[0];
+              var qty = Math.max(1, Math.min(99, parseInt(parts[1] || "1", 10) || 1));
+              fetch("/api/products")
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                  var list = (data && data.products) || [];
+                  var p = null;
+                  for (var i = 0; i < list.length; i++) {
+                    if (list[i].id === pid) { p = list[i]; break; }
+                  }
+                  if (!p) return;
+                  var KEY = "rimpods_cart_v1";
+                  var cart = [];
+                  try { cart = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
+                  var found = false;
+                  for (var j = 0; j < cart.length; j++) {
+                    if (cart[j].product_id === p.id) {
+                      cart[j].quantity = Math.min(99, (cart[j].quantity || 0) + qty);
+                      found = true;
+                      break;
+                    }
+                  }
+                  if (!found) {
+                    cart.push({
+                      product_id: p.id,
+                      name: p.name,
+                      price: p.price,
+                      image: p.image,
+                      weight_kg: p.weight_kg || 1,
+                      quantity: qty
+                    });
+                  }
+                  localStorage.setItem(KEY, JSON.stringify(cart));
+                  window.dispatchEvent(new Event("rimpods:cart"));
+                  params.delete("add");
+                  var qs = params.toString();
+                  window.history.replaceState({}, "", window.location.pathname + (qs ? "?" + qs : "") + window.location.hash);
+                })
+                .catch(function () {});
+            } catch (e) {}
+          })();
+        </script>
     </body>
 </html>
