@@ -83,7 +83,7 @@ export default function Landing() {
       <section className="relative overflow-hidden">
         <Bubbles />
         <div className="caustics absolute inset-0" />
-        <div className="relative max-w-7xl mx-auto px-5 lg:px-10 pt-16 pb-24 lg:pt-28 lg:pb-32 grid lg:grid-cols-12 gap-12 items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-5 lg:px-10 pt-16 pb-24 lg:pt-28 lg:pb-32 grid lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7 rise-in">
             {returningCustomer && (returningCustomer.name || returningCustomer.phone) && (
               <div

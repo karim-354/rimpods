@@ -60,8 +60,12 @@ User clarifications:
   - **Logo PNG (105–135KB) → WebP lokal 5–7KB** di `frontend/public/img/` (brand.js + footer diarahkan ke /img/*.webp).
 - **Mythos v3 (di bawah teks)**: cage zIndex 1 + semua container konten section diberi `relative z-10`
   → garis lewat DI BAWAH teks/kartu (terlihat di ruang kosong & samar menembus glass-card).
-  Start point pindah ke badge "Pakan coral hidup" (startSide: 'right' — keluar horizontal ke kanan
-  via cubicH, turun di celah kiri gambar hero), guard clamp di lengthAtY utk segmen horizontal.
+  Start point pindah ke badge "Pakan coral hidup" (startSide: 'bottom-left' — mulai dari kiri-bawah badge,
+  keluar horizontal ke kanan via cubicH, melengkung turun ke TENGAH gambar hero — menyelam di balik gambar),
+  guard clamp di lengthAtY utk segmen horizontal.
+  CATATAN BUG (Jun 2026): edit z-10 di container hero sempat tidak tersimpan (silent fail) → garis tampil
+  di atas gambar hero. Sudah di-reapply; total 7 container ber-`relative z-10`. Produk TIDAK pernah hilang
+  di preview (diverifikasi 2x screenshot, 3 kartu render normal).
 - **Meta Conversions API (CAPI) server-side**: `send_meta_capi_purchase()` di `backend/server.py`.
   Purchase event ditembak dari webhook Midtrans + admin sync-payment saat status `settlement/capture`.
   Dedup dgn pixel browser via event_id deterministik `purchase-{order_number}` (tracker.js ikut kirim eventID).

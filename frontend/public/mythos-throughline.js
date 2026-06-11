@@ -228,7 +228,9 @@
     var pts = [
       CFG.startSide === "right"
         ? { x: s.right + CFG.startGap, y: s.cy }
-        : { x: s.cx, y: s.bottom + CFG.startGap }
+        : CFG.startSide === "bottom-left"
+          ? { x: s.left + 6, y: s.bottom + 12 }
+          : { x: s.cx, y: s.bottom + CFG.startGap }
     ];
     touchEls.forEach(function (t) { t.el.classList.remove("mythos-touch"); });
     touchEls = [];
@@ -254,7 +256,7 @@
 
     var d = "M " + pts[0].x.toFixed(1) + " " + pts[0].y.toFixed(1);
     for (var i = 1; i < pts.length; i++) {
-      d += (i === 1 && CFG.startSide === "right") ? cubicH(pts[0], pts[1]) : cubic(pts[i - 1], pts[i]);
+      d += (i === 1 && (CFG.startSide === "right" || CFG.startSide === "bottom-left")) ? cubicH(pts[0], pts[1]) : cubic(pts[i - 1], pts[i]);
     }
     line.setAttribute("d", d);
     halo.setAttribute("d", d);
