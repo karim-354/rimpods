@@ -39,7 +39,30 @@
 
   var NS = "http://www.w3.org/2000/svg";
   var pathLength = 0, startY = 0, endY = 0, forkY = 0, branchEndY = 0, lenSamples = [];
-  var branchEls = []; // { line, halo, len }
+  var branchEls = []; // { line, halo, len, dot }
+  var mainDot = null; // comet head kelap-kelip di ujung garis
+
+  function makeDot(svg) {
+    var g = document.createElementNS(NS, "g");
+    g.style.display = "none";
+    var ring = document.createElementNS(NS, "circle");
+    ring.setAttribute("class", "mythos-dot-ring");
+    ring.setAttribute("r", "8");
+    var glow = document.createElementNS(NS, "circle");
+    glow.setAttribute("class", "mythos-dot-glow");
+    glow.setAttribute("r", "12");
+    var core = document.createElementNS(NS, "circle");
+    core.setAttribute("class", "mythos-dot-core");
+    core.setAttribute("r", "5");
+    g.appendChild(ring); g.appendChild(glow); g.appendChild(core);
+    svg.appendChild(g);
+    return g;
+  }
+
+  function placeDot(g, pt) {
+    g.style.display = "";
+    g.setAttribute("transform", "translate(" + pt.x.toFixed(1) + "," + pt.y.toFixed(1) + ")");
+  }
 
   // ---------- 1. Inject styles + cage + SVG (sekali) ----------
   function ensureDom() {
@@ -51,7 +74,13 @@
       "#mythos-cage{position:absolute;top:0;left:0;right:0;height:0;overflow:visible;pointer-events:none;z-index:" + CFG.zIndex + "}" +
       "#mythos-canvas{position:absolute;top:0;left:0;display:block;overflow:visible;pointer-events:none}" +
       ".mythos-line{fill:none;stroke:url(#mythosNeonGradient);stroke-width:" + CFG.strokeWidth + ";stroke-linecap:round;stroke-linejoin:round}" +
-      ".mythos-halo{fill:none;stroke:url(#mythosNeonGradient);stroke-width:" + CFG.haloWidth + ";stroke-linecap:round;stroke-linejoin:round;opacity:" + CFG.haloOpacity + ";filter:blur(7px)}";
+      ".mythos-halo{fill:none;stroke:url(#mythosNeonGradient);stroke-width:" + CFG.haloWidth + ";stroke-linecap:round;stroke-linejoin:round;opacity:" + CFG.haloOpacity + ";filter:blur(7px)}" +
+      ".mythos-dot-core{fill:#fff;animation:mythosCorePulse 1.6s ease-in-out infinite}" +
+      ".mythos-dot-glow{fill:" + CFG.arrowColor + ";filter:blur(8px);animation:mythosTwinkle 1.6s ease-in-out infinite}" +
+      ".mythos-dot-ring{fill:none;stroke:" + CFG.arrowColor + ";animation:mythosRipple 1.6s ease-out infinite}" +
+      "@keyframes mythosTwinkle{0%,100%{opacity:.35;r:9px}50%{opacity:1;r:15px}}" +
+      "@keyframes mythosCorePulse{0%,100%{r:5px}50%{r:7px}}" +
+      "@keyframes mythosRipple{0%{r:8px;opacity:1;stroke-width:3}100%{r:38px;opacity:0;stroke-width:.5}}";
     document.head.appendChild(style);
 
     var cage = document.createElement("div");
@@ -95,6 +124,7 @@
 
     cage.appendChild(svg);
     document.body.insertBefore(cage, document.body.firstChild);
+    mainDot = makeDot(svg);
 
     var cs = getComputedStyle(document.body);
     if (cs.position === "static") document.body.style.position = "relative";
@@ -191,7 +221,7 @@
       if (a.side === "right") x = r.right - (a.offset || 18);
       else if (a.side === "left") x = r.left + (a.offset || 18);
       else x = r.cx + (a.offset || 0);
-      pts.push({ x: x, y: r.cy });
+      pts.push({ x: x, y: r.cy + (a.yOffset || 0) });
     });
     pts.push(forkPt);
 
@@ -216,11 +246,12 @@
       bl.setAttribute("class", "mythos-line");
       bl.setAttribute("marker-end", "url(#mythosArrow)");
       svg.appendChild(bh); svg.appendChild(bl);
-      branchEls.push({ line: bl, halo: bh, len: 0 });
+      branchEls.push({ line: bl, halo: bh, len: 0, dot: makeDot(svg) });
     }
     branchEls.forEach(function (b, idx) {
       if (idx >= nBranches) {
         b.line.setAttribute("d", ""); b.halo.setAttribute("d", ""); b.len = 0;
+        b.dot.style.display = "none";
         return;
       }
       var t = targets[idx];
@@ -293,6 +324,24 @@
       b.line.style.strokeDashoffset = bo;
       b.halo.style.strokeDashoffset = bo;
     });
+
+    // Comet head: dot kelap-kelip menempel di ujung garis yang sedang tergambar
+    var drawnLen = pathLength - offset;
+    var branchesActive = branchEls.some(function (b) { return b.len > 0; });
+    if (branchesActive && bp > 0) {
+      // garis sudah pecah: dot ikut pecah mengikuti ujung tiap cabang
+      if (mainDot) mainDot.style.display = "none";
+      branchEls.forEach(function (b) {
+        if (!b.len) return;
+        placeDot(b.dot, b.line.getPointAtLength(b.len * bp));
+      });
+    } else {
+      branchEls.forEach(function (b) { if (b.dot) b.dot.style.display = "none"; });
+      if (mainDot) {
+        if (drawnLen > 1) placeDot(mainDot, line.getPointAtLength(drawnLen));
+        else mainDot.style.display = "none";
+      }
+    }
   }
 
   // ---------- 4. Scheduling (rAF) + SPA awareness ----------
