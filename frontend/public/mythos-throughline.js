@@ -34,8 +34,19 @@
     endGap: 18,
     forkGap: 110,
     arrowColor: "#FFD700",
+    mobile: null,
+    mobileBreakpoint: 768,
+    mobileCardSelector: ".glass-card",
     defaultStops: [["0%", "#00E5FF"], ["50%", "#8A2BE2"], ["100%", "#FFD700"]]
   }, window.MYTHOS_CONFIG || {});
+
+  // Konfigurasi aktif: di layar sempit pakai override CFG.mobile
+  function activeCfg() {
+    if (CFG.mobile && window.innerWidth < CFG.mobileBreakpoint) {
+      return Object.assign({}, CFG, CFG.mobile);
+    }
+    return CFG;
+  }
 
   var NS = "http://www.w3.org/2000/svg";
   var pathLength = 0, startY = 0, endY = 0, forkY = 0, branchEndY = 0, lenSamples = [];
@@ -82,8 +93,12 @@
       "@keyframes mythosTwinkle{0%,100%{opacity:.35;r:9px}50%{opacity:1;r:15px}}" +
       "@keyframes mythosCorePulse{0%,100%{r:5px}50%{r:7px}}" +
       "@keyframes mythosRipple{0%{r:8px;opacity:1;stroke-width:3}100%{r:38px;opacity:0;stroke-width:.5}}" +
-      ".mythos-touch{display:inline-block;animation:mythosBtnPulse 1.2s ease-in-out infinite}" +
-      "@keyframes mythosBtnPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(245,197,66,0)}50%{transform:scale(1.045);box-shadow:0 0 18px 4px rgba(245,197,66,.45)}}";
+      ".mythos-touch{animation:mythosBtnPulse 1.2s ease-in-out infinite}" +
+      "a.mythos-touch{display:inline-block}" +
+      "@keyframes mythosBtnPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(245,197,66,0)}50%{transform:scale(1.045);box-shadow:0 0 18px 4px rgba(245,197,66,.45)}}" +
+      "@media (max-width:" + (CFG.mobileBreakpoint - 1) + "px){" +
+        CFG.mobileCardSelector + "{position:relative;z-index:5}" +
+      "}";
     document.head.appendChild(style);
 
     var cage = document.createElement("div");
@@ -161,22 +176,23 @@
   }
 
   function buildPath() {
-    var start = document.querySelector(CFG.startSelector);
+    var C = activeCfg();
+    var start = document.querySelector(C.startSelector);
     var svg = document.getElementById("mythos-canvas");
     var line = document.getElementById("mythosLine");
     var halo = document.getElementById("mythosHalo");
 
     // Resolve target akhir: branches (fork) atau endSelector tunggal
     var targets = [];
-    if (CFG.branches.length) {
-      CFG.branches.forEach(function (b) {
+    if (C.branches.length) {
+      C.branches.forEach(function (b) {
         var el = document.querySelector(b.selector);
         if (el) targets.push(abs(el));
       });
     }
     var singleMode = targets.length < 2;
     if (singleMode) {
-      var endEl = document.querySelector(CFG.endSelector);
+      var endEl = document.querySelector(C.endSelector);
       targets = endEl ? [abs(endEl)] : [];
     }
 
@@ -214,27 +230,29 @@
     grad.innerHTML = stops;
 
     // Titik akhir garis utama: fork point (di atas semua target) atau target tunggal
+    // clampX: jaga semua titik tetap di dalam frame (penting di layar sempit)
+    var clampX = function (x) { return Math.max(10, Math.min(W - 10, x)); };
     var minTop = Infinity, sumCx = 0;
     targets.forEach(function (t) { minTop = Math.min(minTop, t.top); sumCx += t.cx; });
     var forkPt;
     if (singleMode) {
-      forkPt = { x: targets[0].cx, y: targets[0].top - CFG.endGap };
+      forkPt = { x: clampX(targets[0].cx), y: targets[0].top - C.endGap };
     } else {
-      forkPt = { x: sumCx / targets.length, y: minTop - CFG.forkGap };
+      forkPt = { x: clampX(sumCx / targets.length), y: minTop - C.forkGap };
     }
 
     // Anchor points garis utama
     var s = abs(start);
     var pts = [
-      CFG.startSide === "right"
-        ? { x: s.right + CFG.startGap, y: s.cy }
-        : CFG.startSide === "bottom-left"
-          ? { x: s.left + 6, y: s.bottom + 12 }
-          : { x: s.cx, y: s.bottom + CFG.startGap }
+      C.startSide === "right"
+        ? { x: clampX(s.right + C.startGap), y: s.cy }
+        : C.startSide === "bottom-left"
+          ? { x: clampX(s.left + 6), y: s.bottom + 12 }
+          : { x: clampX(s.cx), y: s.bottom + C.startGap }
     ];
     touchEls.forEach(function (t) { t.el.classList.remove("mythos-touch"); });
     touchEls = [];
-    CFG.anchors.forEach(function (a) {
+    C.anchors.forEach(function (a) {
       var el = document.querySelector(a.selector);
       if (!el) return;
       var r = abs(el), x;
@@ -242,21 +260,25 @@
       else if (a.side === "left") x = r.left + (a.offset || 18);
       else x = r.cx + (a.offset || 0);
       var y = r.cy + (a.yOffset || 0);
-      pts.push({ x: x, y: y });
+      pts.push({ x: clampX(x), y: y });
       if (a.touch) touchEls.push({ el: el, y: y });
     });
     // Target cabang (tombol CTA) juga ikut berdenyut saat dot mendarat
     if (!singleMode) {
-      CFG.branches.forEach(function (b) {
+      C.branches.forEach(function (b) {
         var el = document.querySelector(b.selector);
-        if (el) touchEls.push({ el: el, y: abs(el).top - CFG.endGap });
+        if (el) touchEls.push({ el: el, y: abs(el).top - C.endGap });
       });
+    } else if (targets.length) {
+      // singleMode: target akhir ikut berdenyut saat panah tiba
+      var endTouch = document.querySelector(C.endSelector);
+      if (endTouch) touchEls.push({ el: endTouch, y: targets[0].top - C.endGap });
     }
     pts.push(forkPt);
 
     var d = "M " + pts[0].x.toFixed(1) + " " + pts[0].y.toFixed(1);
     for (var i = 1; i < pts.length; i++) {
-      d += (i === 1 && (CFG.startSide === "right" || CFG.startSide === "bottom-left")) ? cubicH(pts[0], pts[1]) : cubic(pts[i - 1], pts[i]);
+      d += (i === 1 && (C.startSide === "right" || C.startSide === "bottom-left")) ? cubicH(pts[0], pts[1]) : cubic(pts[i - 1], pts[i]);
     }
     line.setAttribute("d", d);
     halo.setAttribute("d", d);
@@ -287,7 +309,7 @@
       }
       var t = targets[idx];
       var bd = "M " + forkPt.x.toFixed(1) + " " + forkPt.y.toFixed(1) +
-        cubic(forkPt, { x: t.cx, y: t.top - CFG.endGap });
+        cubic(forkPt, { x: t.cx, y: t.top - C.endGap });
       b.line.setAttribute("d", bd);
       b.halo.setAttribute("d", bd);
       b.len = b.line.getTotalLength();
@@ -311,7 +333,7 @@
     startY = s.top;
     forkY = forkPt.y;
     branchEndY = 0;
-    targets.forEach(function (t) { branchEndY = Math.max(branchEndY, t.top - CFG.endGap); });
+    targets.forEach(function (t) { branchEndY = Math.max(branchEndY, t.top - C.endGap); });
     endY = branchEndY;
     update();
   }

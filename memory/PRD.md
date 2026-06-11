@@ -77,6 +77,16 @@ User clarifications:
     monotonic di lenSamples (dukung dip/wave naik-turun kecil).
   - PELAJARAN: JANGAN edit paralel banyak search_replace pada SATU file — 2 dari 9 edit Landing.jsx hilang
     (race condition) walau dilaporkan sukses. Edit file yang sama harus berurutan + verifikasi grep.
+- **Mythos v5 — Mobile fix (Jun 2026)**:
+  - `CFG.mobile` override (aktif < 768px via `activeCfg()` saat buildPath): anchors lembut (offset ±110),
+    TANPA fork — `endSelector: '.glass-card.p-10'` (panah tunggal menunjuk kartu CTA dari atas).
+  - `clampX(10..W-10)` di semua titik path — garis tak pernah keluar frame.
+  - Media query injeksi: `.glass-card{position:relative;z-index:5}` di mobile → garis menyelinap DI BAWAH
+    kartu (terlihat di celah antar kartu), teks aman.
+  - Kecepatan: rasio pathLength/spanY mobile = 1.02 (sebelumnya melesat krn ekskursi horizontal besar).
+  - `.mythos-touch` dipisah: `a.mythos-touch{display:inline-block}` saja (display inline-block di div block
+    merusak layout). Touch target singleMode = elemen endSelector.
+  - Desktop tidak berubah (regresi dicek: fork 2 cabang + dots tetap jalan).
 - **Meta Conversions API (CAPI) server-side**: `send_meta_capi_purchase()` di `backend/server.py`.
   Purchase event ditembak dari webhook Midtrans + admin sync-payment saat status `settlement/capture`.
   Dedup dgn pixel browser via event_id deterministik `purchase-{order_number}` (tracker.js ikut kirim eventID).
