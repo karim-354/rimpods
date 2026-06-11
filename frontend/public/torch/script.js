@@ -148,6 +148,7 @@
     pts.push({ x: h.cx, y: h.bottom + 24 });
 
     // 2. Weaving through Matrix + Engine cards
+    const mids = [];
     ANCHOR_IDS.forEach((id) => {
       const el = document.querySelector(`[data-testid="${id}"]`);
       if (!el) return;
@@ -159,8 +160,33 @@
         const idx = parseInt(id.split("-").pop(), 10) || 1;
         x = r.cx + (idx % 2 === 0 ? 140 : -140);
       }
-      pts.push({ x: x, y: r.cy });
+      mids.push({ x: Math.max(24, Math.min(W - 24, x)), y: r.cy });
     });
+
+    // CRITICAL: sort by page Y so the path always flows downward. On mobile
+    // the two matrix columns stack vertically, so DOM order != visual order —
+    // without sorting the line loops up/down and tangles over itself.
+    mids.sort((a, b) => a.y - b.y);
+
+    let filtered = mids;
+    if (W < 768) {
+      // Narrow screens: cards stack full-width.
+      // 1) Drop anchors that sit too close vertically (kinks/loops).
+      filtered = [];
+      mids.forEach((p) => {
+        if (!filtered.length || p.y - filtered[filtered.length - 1].y > 90) {
+          filtered.push(p);
+        }
+      });
+      // 2) Edge-hugging X coords would swing the line across the whole
+      //    screen — replace with a gentle center weave.
+      const amp = Math.min(W * 0.17, 72);
+      filtered.forEach((p, i) => {
+        p.x = W / 2 + (i % 2 === 0 ? -amp : amp);
+      });
+    }
+
+    filtered.forEach((p) => pts.push(p));
 
     // 3. End: top-center of CTA button (slightly above so arrow lands on it)
     const c = abs(cta);

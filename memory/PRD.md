@@ -317,3 +317,13 @@ Saat ini `EMAIL_ADMIN_NOTIFY=ocepjos@gmail.com` supaya testing bisa jalan. Resta
 | Purchase | rimpods.com/sukses (client) + Meta CAPI webhook (server, dedup via `event_id=purchase-{order_number}`) | ✅ |
 
 **Tested:** 4/4 CTA fire AddToCart ✓, no stray InitiateCheckout ✓, PageView + ViewContent fire di awal ✓.
+
+## Fix: SVG Mythos Line kusut di mobile /torch/ (Jun 11, 2026)
+**Issue:** Di smartphone, garis SVG (mythosLine) di section Stress Matrix terlihat kusut — banyak garis menumpuk/menyilang.
+**Root cause:** Di mobile, kolom stressor & solution stack vertikal, tapi anchor ANCHOR_IDS interleaved (stressor-1→solution-1→stressor-2...) sehingga path naik-turun halaman & menyilang dirinya sendiri. Plus X anchor nempel tepi kartu full-width = ayunan selebar layar.
+**Fix (`/app/frontend/public/torch/script.js` buildMythosPath):**
+- Anchor mid-points di-sort berdasarkan Y halaman (selalu mengalir ke bawah).
+- Mobile only (W<768): filter anchor yang jarak vertikalnya <90px, lalu X diganti weave halus di tengah (amplitudo min(W*0.17, 72px)).
+- Desktop: logika asli dipertahankan (weave antar kolom, sort stabil tidak mengubah urutan).
+**CSS (`styles.css`):** media query max-width:767px → stroke line 3px, halo 8px opacity .3 blur 5px.
+**Verified:** screenshot mobile 390px (kurva S halus tunggal) & desktop 1920px (weave antar kolom seperti semula).
