@@ -48,6 +48,15 @@ User clarifications:
   **Comet head**: dot kelap-kelip (core putih + glow gold twinkle + ring ripple 1.6s) menempel di ujung garis
   yang sedang tergambar; saat fork di CTA, dot pecah jadi 2 mengikuti tiap cabang.
   Alur di section produk: menyentuh tombol "Masukkan Keranjang" ketiga produk berurutan (anchor yOffset -22/0/+22).
+  **Touch pulse**: tombol yang sedang dilintasi comet head ikut berdenyut halus (class .mythos-touch,
+  scale 1.045 + glow gold) — aktif di 3 tombol keranjang + 2 tombol CTA.
+- **Optimasi performa (Jun 2026)**:
+  - Code splitting React.lazy di App.js: Checkout (berisi Leaflet ~48KB gz), Success, Admin, AuthCallback
+    jadi chunk terpisah — bundle awal turun ke 143KB gz.
+  - Font Google dipindah dari @import CSS (render-blocking) ke <link> di head + preconnect.
+  - snap.js Midtrans & emergent-main.js diberi defer.
+  - Hero image: fetchPriority="high" + decoding async + <link rel="preload"> (sebelumnya loading="lazy" — buruk utk LCP).
+  - Preconnect ke customer-assets.emergentagent.com. Logo header tidak lagi lazy.
 - **Meta Conversions API (CAPI) server-side**: `send_meta_capi_purchase()` di `backend/server.py`.
   Purchase event ditembak dari webhook Midtrans + admin sync-payment saat status `settlement/capture`.
   Dedup dgn pixel browser via event_id deterministik `purchase-{order_number}` (tracker.js ikut kirim eventID).

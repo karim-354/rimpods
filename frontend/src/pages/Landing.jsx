@@ -154,7 +154,8 @@ export default function Landing() {
               <img
                 src="https://customer-assets.emergentagent.com/job_api-frontend-base/artifacts/1yj35xwu_reef_tank.webp"
                 alt="Reef tank coral mekar"
-                loading="lazy"
+                fetchPriority="high"
+                decoding="async"
                 className="rounded-[1.6rem] w-full h-auto object-contain max-h-[600px]"
               />
               <div className="absolute -bottom-6 -left-6 hidden lg:block glass-card rounded-2xl px-5 py-4">

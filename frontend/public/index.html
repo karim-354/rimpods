@@ -22,12 +22,14 @@
         
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://customer-assets.emergentagent.com" />
+        <link rel="preload" as="image" href="https://customer-assets.emergentagent.com/job_api-frontend-base/artifacts/1yj35xwu_reef_tank.webp" fetchpriority="high" />
+        <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@600&display=swap" rel="stylesheet" />
         
         <title>Rimpods — Live Coral Food</title>
         
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
-        <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
+        <script src="https://assets.emergent.sh/scripts/emergent-main.js" defer></script>
         
         <script>
         !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
@@ -41,7 +43,7 @@
         }(window, document, 'ttq');
         </script>
         
-        <script src="https://app.midtrans.com/snap/snap.js" data-client-key="Mid-client-E0IGvMibArVXfy3U"></script>
+        <script src="https://app.midtrans.com/snap/snap.js" data-client-key="Mid-client-E0IGvMibArVXfy3U" defer></script>
     </head>
     
     <body>
@@ -102,9 +104,9 @@
               { selector: '[data-testid="cta-wa-btn"]' }
             ],
             anchors: [
-              { selector: '[data-testid="add-to-cart-rotifer-2l-phyto"]', side: 'center', yOffset: -22 },
-              { selector: '[data-testid="add-to-cart-paket-hemat-5r-1p"]', side: 'center' },
-              { selector: '[data-testid="add-to-cart-tbn-turn-back-nutrients"]', side: 'center', yOffset: 22 },
+              { selector: '[data-testid="add-to-cart-rotifer-2l-phyto"]', side: 'center', yOffset: -22, touch: true },
+              { selector: '[data-testid="add-to-cart-paket-hemat-5r-1p"]', side: 'center', touch: true },
+              { selector: '[data-testid="add-to-cart-tbn-turn-back-nutrients"]', side: 'center', yOffset: 22, touch: true },
               { selector: '#cerita', side: 'center', offset: -240 },
               { selector: '#cara-pakai', side: 'center', offset: 240 },
               { selector: '#testimoni', side: 'center', offset: -240 },

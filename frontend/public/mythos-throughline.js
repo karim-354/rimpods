@@ -41,6 +41,7 @@
   var pathLength = 0, startY = 0, endY = 0, forkY = 0, branchEndY = 0, lenSamples = [];
   var branchEls = []; // { line, halo, len, dot }
   var mainDot = null; // comet head kelap-kelip di ujung garis
+  var touchEls = []; // { el, y } -> tombol yang berdenyut saat disentuh comet head
 
   function makeDot(svg) {
     var g = document.createElementNS(NS, "g");
@@ -80,7 +81,9 @@
       ".mythos-dot-ring{fill:none;stroke:" + CFG.arrowColor + ";animation:mythosRipple 1.6s ease-out infinite}" +
       "@keyframes mythosTwinkle{0%,100%{opacity:.35;r:9px}50%{opacity:1;r:15px}}" +
       "@keyframes mythosCorePulse{0%,100%{r:5px}50%{r:7px}}" +
-      "@keyframes mythosRipple{0%{r:8px;opacity:1;stroke-width:3}100%{r:38px;opacity:0;stroke-width:.5}}";
+      "@keyframes mythosRipple{0%{r:8px;opacity:1;stroke-width:3}100%{r:38px;opacity:0;stroke-width:.5}}" +
+      ".mythos-touch{display:inline-block;animation:mythosBtnPulse 1.2s ease-in-out infinite}" +
+      "@keyframes mythosBtnPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(245,197,66,0)}50%{transform:scale(1.045);box-shadow:0 0 18px 4px rgba(245,197,66,.45)}}";
     document.head.appendChild(style);
 
     var cage = document.createElement("div");
@@ -214,6 +217,8 @@
     // Anchor points garis utama
     var s = abs(start);
     var pts = [{ x: s.cx, y: s.bottom + CFG.startGap }];
+    touchEls.forEach(function (t) { t.el.classList.remove("mythos-touch"); });
+    touchEls = [];
     CFG.anchors.forEach(function (a) {
       var el = document.querySelector(a.selector);
       if (!el) return;
@@ -221,8 +226,17 @@
       if (a.side === "right") x = r.right - (a.offset || 18);
       else if (a.side === "left") x = r.left + (a.offset || 18);
       else x = r.cx + (a.offset || 0);
-      pts.push({ x: x, y: r.cy + (a.yOffset || 0) });
+      var y = r.cy + (a.yOffset || 0);
+      pts.push({ x: x, y: y });
+      if (a.touch) touchEls.push({ el: el, y: y });
     });
+    // Target cabang (tombol CTA) juga ikut berdenyut saat dot mendarat
+    if (!singleMode) {
+      CFG.branches.forEach(function (b) {
+        var el = document.querySelector(b.selector);
+        if (el) touchEls.push({ el: el, y: abs(el).top - CFG.endGap });
+      });
+    }
     pts.push(forkPt);
 
     var d = "M " + pts[0].x.toFixed(1) + " " + pts[0].y.toFixed(1);
@@ -342,6 +356,11 @@
         else mainDot.style.display = "none";
       }
     }
+
+    // Tombol berdenyut halus saat comet head melintas di dekatnya
+    touchEls.forEach(function (t) {
+      t.el.classList.toggle("mythos-touch", Math.abs(targetY - t.y) < 70);
+    });
   }
 
   // ---------- 4. Scheduling (rAF) + SPA awareness ----------
