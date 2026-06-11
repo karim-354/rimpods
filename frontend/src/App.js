@@ -11,6 +11,13 @@ const Success = lazy(() => import("./pages/Success"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AuthCallback = lazy(() => import("./pages/admin/AuthCallback"));
 
+// Produksi: static server tidak me-resolve directory index utk /torch/,
+// SPA fallback menangkapnya → halaman kosong. Redirect ke file statisnya.
+function TorchRedirect() {
+  window.location.replace("/torch/index.html" + window.location.search + window.location.hash);
+  return null;
+}
+
 // Detect #session_id=... during render (not useEffect) to avoid race conditions
 function AppRouter() {
   const location = useLocation();
@@ -28,6 +35,8 @@ function AppRouter() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/sukses" element={<Success />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/torch" element={<TorchRedirect />} />
+        <Route path="/torch/*" element={<TorchRedirect />} />
       </Routes>
     </Suspense>
   );

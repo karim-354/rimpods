@@ -99,6 +99,12 @@ User clarifications:
     hapus param `add` via replaceState (utm_source dipertahankan utk atribusi).
   - Teruji: /torch/ render (eye-delta 0, 13 gambar, CTA benar); /checkout?add=rotifer-2l-phyto:2 →
     cart qty 2 weight_kg 3, URL bersih jadi /checkout?utm_source=torch-landing.
+  - **FIX PROD (Jun 2026)**: di production, static server TIDAK me-resolve directory index — `/torch/`
+    ditangkap SPA fallback → halaman hitam kosong. Solusi: route React `/torch` & `/torch/*` →
+    `TorchRedirect` (window.location.replace ke `/torch/index.html` + query dipertahankan).
+    `/torch/index.html` dilayani langsung (200) di prod. Diverifikasi dgn simulasi server python
+    yang meniru perilaku prod persis. CATATAN: `npx serve -s` TIDAK cocok utk simulasi (cleanUrls
+    me-redirect /torch/index.html balik ke /torch → loop). Link iklan tercepat: /torch/index.html.
 - **Meta Conversions API (CAPI) server-side**: `send_meta_capi_purchase()` di `backend/server.py`.
   Purchase event ditembak dari webhook Midtrans + admin sync-payment saat status `settlement/capture`.
   Dedup dgn pixel browser via event_id deterministik `purchase-{order_number}` (tracker.js ikut kirim eventID).
