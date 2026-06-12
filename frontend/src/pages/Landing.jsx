@@ -6,7 +6,7 @@ import { useCart, formatRupiah } from "../lib/cart";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
-import { Star, Sparkles, Droplets, Shield, Waves, ChevronRight, Truck, MessageCircle, Heart, ExternalLink, Crown } from "lucide-react";
+import { Star, Sparkles, Droplets, Shield, Waves, ChevronRight, Truck, MessageCircle, Heart, ExternalLink, Crown, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 import { trackAddToCart, trackViewContent } from "../lib/tracker";
 import UpsellModal from "../components/UpsellModal";
@@ -48,7 +48,17 @@ export default function Landing() {
   const [cartOpen, setCartOpen] = useState(false);
   const [upsellTarget, setUpsellTarget] = useState(null);
   const [returningCustomer, setReturningCustomer] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const { add } = useCart();
+
+  useEffect(() => {
+    axios.get(`${API}/testimonials`).then((r) => {
+      const items = (r.data.testimonials || [])
+        .filter((t) => t.home > 0)
+        .sort((a, b) => a.home - b.home);
+      setReviews(items);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     setReturningCustomer(getReturningCustomer());
@@ -367,32 +377,63 @@ export default function Landing() {
       </section>
 
       {/* TESTIMONI */}
-      <section id="testimoni" className="py-24 lg:py-32 bg-[hsl(var(--reef-mid))]">
-        <div className="max-w-6xl mx-auto px-5 lg:px-10">
+      <section id="testimoni" className="relative py-24 lg:py-32 bg-[hsl(var(--reef-mid))] overflow-hidden">
+        {/* Coral mekar di sekeliling section */}
+        <img src="/torch/images/torch_2.webp" alt="" loading="lazy" className="hidden lg:block absolute -left-12 top-28 w-40 h-40 object-cover rounded-full opacity-70 rotate-6 border-2 border-[hsla(174,70%,55%,0.35)] shadow-[0_0_70px_hsla(174,70%,55%,0.3)] pointer-events-none" />
+        <img src="/torch/images/torch_5.webp" alt="" loading="lazy" className="hidden lg:block absolute -right-14 top-1/3 w-48 h-48 object-cover rounded-full opacity-70 -rotate-6 border-2 border-[hsla(45,90%,60%,0.35)] shadow-[0_0_70px_hsla(45,90%,60%,0.25)] pointer-events-none" />
+        <img src="/torch/images/torch_8.webp" alt="" loading="lazy" className="hidden lg:block absolute -left-10 bottom-36 w-32 h-32 object-cover rounded-full opacity-60 -rotate-3 border-2 border-[hsla(174,70%,55%,0.3)] shadow-[0_0_60px_hsla(174,70%,55%,0.25)] pointer-events-none" />
+        <img src="/torch/images/torch_10.webp" alt="" loading="lazy" className="hidden xl:block absolute -right-8 bottom-20 w-36 h-36 object-cover rounded-full opacity-60 rotate-12 border-2 border-[hsla(45,90%,60%,0.3)] shadow-[0_0_60px_hsla(45,90%,60%,0.2)] pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto px-5 lg:px-10 relative">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <Badge className="bg-[hsla(174,70%,55%,0.15)] text-[hsl(var(--reef-glow))] border border-[hsla(174,70%,55%,0.3)] rounded-full px-4 py-1 mb-4">
               Suara Reefer
             </Badge>
             <h2 className="font-display text-4xl lg:text-5xl tracking-tight">Reefer lain berkata begini.</h2>
+            <p className="mt-3 text-sm opacity-70">Ulasan asli pembeli — lengkap dengan foto tank mereka.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { n: "Bayu, Jakarta", q: "Acro saya menunjukkan ekstensi polip yang ekspresif sejak hari ketiga. Konsistensinya yang saya apresiasi." },
-              { n: "Sari, Surabaya", q: "Saat parameter air saya sempat bergeser, TBN membantu mengembalikan ketenangan di tank. Terima kasih, Rimpods." },
-              { n: "Reza, Bandung", q: "Paket hemat menjadi pilihan rutin saya. Satu kiriman, satu bulan tenang, dan coral terlihat benar-benar nyaman." },
-            ].map((t, i) => (
-              <figure key={i} className="glass-card rounded-2xl p-7">
-                <div className="flex gap-1 mb-3">
-                  {Array.from({ length: 5 }).map((_, k) => (
-                    <Star key={k} className="w-4 h-4 fill-[hsl(var(--reef-glow))] text-[hsl(var(--reef-glow))]" />
-                  ))}
-                </div>
-                <blockquote className="text-lg leading-relaxed">"{t.q}"</blockquote>
-                <figcaption className="mt-4 text-sm opacity-70">— {t.n}</figcaption>
-              </figure>
-            ))}
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-6" data-testid="landing-testi-grid">
+            {reviews.map((t) => {
+              const photos = t.home_photos?.length ? t.home_photos : [];
+              return (
+                <figure key={t.id} className="glass-card rounded-2xl p-6 mb-6 break-inside-avoid" data-testid={`landing-testi-${t.id}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex gap-1">
+                      {Array.from({ length: t.rating || 5 }).map((_, k) => (
+                        <Star key={k} className="w-4 h-4 fill-[hsl(var(--reef-glow))] text-[hsl(var(--reef-glow))]" />
+                      ))}
+                    </div>
+                    <span className="text-[10px] uppercase tracking-widest opacity-50">{t.date_label}</span>
+                  </div>
+                  <blockquote className="leading-relaxed">"{t.text}"</blockquote>
+                  {photos.length > 0 && (
+                    <div className="mt-4 flex gap-2 justify-center flex-wrap">
+                      {photos.map((p, i) => (
+                        <img
+                          key={i}
+                          src={p}
+                          alt={`Foto tank ${t.name}`}
+                          loading="lazy"
+                          className={`${photos.length === 1 ? "h-36 w-36" : "h-24 w-24"} object-cover rounded-xl border border-[hsla(174,70%,55%,0.25)]`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <figcaption className="mt-4 flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5 text-sm font-semibold">
+                      {t.name}
+                      <BadgeCheck className="w-4 h-4 text-[hsl(var(--reef-glow))]" />
+                    </span>
+                    <span className="text-[11px] opacity-60 text-right">{t.product}</span>
+                  </figcaption>
+                </figure>
+              );
+            })}
           </div>
-          <div className="text-center mt-10">
+          <p className="text-center text-xs opacity-50 mt-4" data-testid="landing-testi-disclaimer">
+            Ulasan diimpor apa adanya dari Tokopedia (Tokopedia &amp; TikTok Shop by Tokopedia).
+          </p>
+          <div className="text-center mt-8">
             <a href="/testimoni" data-testid="landing-wall-link">
               <Button variant="outline" className="bg-transparent border-[hsla(174,70%,55%,0.4)] text-[hsl(var(--reef-foam))] hover:bg-[hsla(174,70%,55%,0.1)] h-12 px-7 rounded-full">
                 Baca 1.451+ ulasan asli pembeli →

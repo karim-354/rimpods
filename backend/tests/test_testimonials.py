@@ -41,7 +41,7 @@ class TestPublicTestimonials:
         assert first["name"] == "Achmad"
         assert len(first["photos"]) == 3
         for p in first["photos"]:
-            assert p.startswith("/testimonials/") and p.endswith(".jpg")
+            assert p.startswith("/testimonials/") and p.endswith(".webp")
 
     def test_no_mongo_objectid_leak(self, client):
         data = client.get(f"{BASE_URL}/api/testimonials", timeout=30).json()
@@ -51,7 +51,7 @@ class TestPublicTestimonials:
 
 # --- Static photo accessibility (served by React public) ---
 class TestTestimonialPhotosPublic:
-    @pytest.mark.parametrize("fname", ["achmad-1.jpg", "achmad-2.jpg", "achmad-3.jpg"])
+    @pytest.mark.parametrize("fname", ["achmad-1.webp", "achmad-2.webp", "achmad-3.webp"])
     def test_photo_public_accessible(self, client, fname):
         r = client.get(f"{BASE_URL}/testimonials/{fname}", timeout=30)
         assert r.status_code == 200, f"{fname} -> {r.status_code}"

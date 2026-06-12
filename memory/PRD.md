@@ -333,3 +333,29 @@ Saat ini `EMAIL_ADMIN_NOTIFY=ocepjos@gmail.com` supaya testing bisa jalan. Resta
 - Failsafe 1.2s di script.js diubah: hanya force-reveal elemen yang SUDAH di viewport (sebelumnya semua elemen → mematikan reveal-on-scroll).
 - Catch-up scroll handler: flick cepat yang membuat IO skip elemen → elemen di atas viewport (bottom<0) langsung di-reveal.
 - Verified: mobile 390px — kartu fade-in saat scroll (opacity mid-transition tertangkap), jump instan ke bawah tidak meninggalkan elemen hidden di atas viewport.
+
+## Feature: Wall of Reefs — Testimoni Tokopedia (Jun 11, 2026)
+**Request user:** Halaman testimoni (opsi C) tapi "terima beres" — data diambil dari toko Tokopedia rimpods tanpa input manual.
+**Cara import:** Tokopedia blokir headless browser & curl (anti-bot), TAPI halaman `/review` per PRODUK ter-render server-side via crawl tool. 4 produk disapu → 35 ulasan asli (nama, isi, tanggal relatif). 18 foto review diunduh dari CDN signed-URL (kedaluwarsa 12 Jun) → trim padding putih (PIL) → /app/frontend/public/testimonials/*.jpg.
+**Statistik agregat terverifikasi:** 4.9/5, 6.261 rating, 1.451 ulasan, 98% puas, 96,66% bintang 5, 15rb+ terjual.
+**Backend (/app/backend/testimonials.py):**
+- seed_testimonials(sync_db): idempotent upsert tkp-001..tkp-035 + shop_stats (id "tokopedia"). Dipanggil di server.py startup.
+- GET /api/testimonials (publik): {stats, testimonials visible sort by order}.
+- Admin CRUD (require_admin): GET/POST /api/admin/testimonials, PUT/DELETE /api/admin/testimonials/{id}.
+**Frontend:**
+- /testimoni → pages/WallOfReefs.jsx: trust banner (wall-stats-banner), masonry grid (wall-grid, kartu wall-card-{id} + foto + verified badge), link Tokopedia, CTA checkout.
+- Landing: tombol landing-wall-link di bawah section testimoni → /testimoni.
+- /torch/index.html: link proof-wall-link di section #proof → /testimoni.
+- Admin: components/admin/TestimonialsManager.jsx (list + toggle visible + delete + form tambah) dirender di AdminDashboard.
+**Testing:** iteration_13.json — backend 13/13, frontend 14/14, regresi landing/torch/checkout aman. Regression suite: /app/backend/tests/test_testimonials.py.
+**Catatan:** foto review hanya 200px (batas CDN Tokopedia); admin bisa tambah testimoni baru manual kapan saja.
+
+## Feature: Testimoni asli naik ke Homepage (Jun 12, 2026)
+**Request:** Switch 3 testimoni hardcoded di homepage dengan ulasan asli dari /testimoni; kriteria foto aquarium/produk depan aquarium; 7-10 kartu; desain cantik dengan coral warna-warni; semua gambar WebP; + disclaimer "Ulasan diimpor apa adanya dari Tokopedia (Tokopedia & TikTok Shop by Tokopedia)."
+**Kurasi foto (via analisis AI contact sheet):** foto aquarium/coral: achmad-1, falisha-1/2/3, nanang-1/2, bagus-1, riyan-1. Foto packing TIDAK ditampilkan di homepage.
+**Implementasi:**
+- Semua 18 foto testimoni dikonversi jpg→WebP q86 (file .jpg dihapus); seed + test diperbarui.
+- Seed: field baru `home` (urutan 1-9, 0=tidak tampil) dan `home_photos` (subset foto layak homepage). 9 kartu: Achmad, Falisha, NANANG, Riyan, Bagus (berfoto) + Budi, M***a, Hanif, Benni (teks).
+- Landing.jsx: section #testimoni kini fetch /api/testimonials, filter home>0, masonry columns 3/2/1, kartu = bintang + teks + foto + nama + BadgeCheck + produk. Deco: 4 foto coral bulat (reuse /torch/images/torch_*.webp — hemat, tanpa generate baru) di tepi section dengan glow. Disclaimer (data-testid=landing-testi-disclaimer) di bawah grid, tombol "Baca 1.451+ ulasan" tetap.
+**Testing:** pytest 13/13 (test diperbarui ke .webp); screenshot desktop 1920 + mobile 390 OK (9 kartu + disclaimer).
+**Catatan deploy:** perubahan butuh redeploy ke rimpods.com; seed berjalan otomatis saat startup produksi (update path .jpg→.webp & field home).
