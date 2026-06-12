@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/button";
 import { LogOut, ShieldAlert, TrendingUp, ShoppingBag, Gift, Wallet, RefreshCcw } from "lucide-react";
 import { formatRupiah } from "../../lib/cart";
 import WhatsAppQuickActions from "../../components/admin/WhatsAppQuickActions";
+import { TestimonialsManager } from "../../components/admin/TestimonialsManager";
 import { toast } from "sonner";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;

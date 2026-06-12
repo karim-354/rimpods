@@ -359,3 +359,8 @@ Saat ini `EMAIL_ADMIN_NOTIFY=ocepjos@gmail.com` supaya testing bisa jalan. Resta
 - Landing.jsx: section #testimoni kini fetch /api/testimonials, filter home>0, masonry columns 3/2/1, kartu = bintang + teks + foto + nama + BadgeCheck + produk. Deco: 4 foto coral bulat (reuse /torch/images/torch_*.webp — hemat, tanpa generate baru) di tepi section dengan glow. Disclaimer (data-testid=landing-testi-disclaimer) di bawah grid, tombol "Baca 1.451+ ulasan" tetap.
 **Testing:** pytest 13/13 (test diperbarui ke .webp); screenshot desktop 1920 + mobile 390 OK (9 kartu + disclaimer).
 **Catatan deploy:** perubahan butuh redeploy ke rimpods.com; seed berjalan otomatis saat startup produksi (update path .jpg→.webp & field home).
+
+## Bugfix: rimpods.com/admin blank setelah login Google (Jun 12, 2026)
+**Root cause:** import `TestimonialsManager` di AdminDashboard.jsx hilang (tertimpa saat rangkaian edit sebelumnya), padahal `<TestimonialsManager />` dirender di dashboard ter-autentikasi → ReferenceError runtime → blank page HANYA setelah login (login gate aman karena komponen belum dirender; build produksi tetap sukses karena no-undef cuma warning).
+**Fix:** restore `import { TestimonialsManager } from "../../components/admin/TestimonialsManager";`. Verifikasi: webpack compiled successfully, audit semua tag JSX vs imports lengkap, login gate render normal.
+**Catatan:** tampilan admin ter-autentikasi tidak bisa di-e2e-test di preview (Emergent Google Auth) — user verifikasi di produksi setelah redeploy.
